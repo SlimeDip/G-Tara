@@ -7,6 +7,31 @@ namespace G_Tara.Services
         private readonly string _apiKey;
         private readonly HttpClient _httpClient;
 
+        public List<string> GetWeatherTips(WeatherData weather)//Gives tips depending on the weather or temperature
+        {
+            var tips = new List<string>();
+
+            if (weather == null) return tips;
+
+            if (weather.Description.Contains("rain"))
+                tips.Add("Bring an umbrella!");
+
+            if (weather.Temperature >= 30)
+                tips.Add("Stay hydrated and wear light clothing!");
+
+            if (weather.Temperature <= 20)
+                tips.Add("Stay warm and bring a jacket!");
+
+            if (weather.WindSpeed > 25)
+                tips.Add("Be cautious of strong winds!");
+
+            if (weather.Humidity > 80)
+                tips.Add("Expect a humid day, stay cool!");
+
+            return tips;
+        }
+
+
         public WeatherService()
         {
             _apiKey = Environment.GetEnvironmentVariable("OPENWEATHER_API_KEY");

@@ -7,6 +7,7 @@ namespace G_Tara
     {
         private readonly GalaDataService _dataService;
         private readonly ParticipantsDataService _participantsDataService;
+        private readonly WeatherService _weatherService;
         private Host? _currentHost;
         private List<Participant> _participants;
         private List<Gala> _galas;
@@ -20,6 +21,7 @@ namespace G_Tara
             InitializeComponent();
             _dataService = new GalaDataService();
             _participantsDataService = new ParticipantsDataService();
+            _weatherService = new WeatherService();
             _galas = new List<Gala>();
             _participants = new List<Participant>();
         }
@@ -190,7 +192,7 @@ namespace G_Tara
             participantsForm.ShowDialog(this);
         }
 
-        private void btnAutoEmail_Click(object sender, EventArgs e)
+        private async void btnAutoEmail_Click(object sender, EventArgs e) // Modified
         {
             var gala = GetSelectedGala();
             if (gala == null)
@@ -203,12 +205,12 @@ namespace G_Tara
             {
                 if (confirmForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    SendPlanEmailToParticipants(gala);
+                    await SendPlanEmailToParticipants(gala); //Modified: Waits to complete the process before proceeding
                 }
             }
         }
 
-        private void SendPlanEmailToParticipants(Gala gala)
+        private async Task SendPlanEmailToParticipants(Gala gala)//Modified
         {
             var gmailParticipants = gala.Participants.Where(p => !string.IsNullOrWhiteSpace(p.Email) && p.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)).ToList();
             if (!gmailParticipants.Any())
@@ -230,15 +232,32 @@ namespace G_Tara
                 Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass),
                 EnableSsl = true
             };
+            
+            var weather = await _weatherService.GetWeatherAsync( //Get weather data
+                gala.Latitude,
+                gala.Longitude,
+                gala.ScheduledDate
+             );
+
+            var tips = weather != null //Gives tips depending on the Weather conditions
+                ? _weatherService.GetWeatherTips(weather)
+                : new List<string> { "Weather data unavailable. Please check conditions manually." };
+
+            string tipSection = string.Join("\n- ", tips); 
+
 
             foreach (var participant in gmailParticipants)
             {
                 try
                 {
                     var mail = new System.Net.Mail.MailMessage(smtpUser, participant.Email)
-                    {
+                    {                        
                         Subject = $"Gala Plan: {gala.Name}",
-                        Body = $"Plan Details:\n{gala.Plan}\n\nDate: {gala.ScheduledDate:yyyy-MM-dd}\nLocation: {gala.Location}",
+                        Body = $"Tara na, {participant.Name}!\n" +
+                        $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n\n" +
+                        $"Here are the Gala Details:\n{gala.Plan}\n\nDate: {gala.ScheduledDate:yyyy-MM-dd}\nLocation: {gala.Location} \n\nRecommendations:\n- {tipSection}" +
+                        $"\nPrepare accordingly! Keep safe and don't forget to have Fun!\n" +
+                        $"\nAno G? Tara!",
                     };
                     smtp.Send(mail);
                 }
