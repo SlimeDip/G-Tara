@@ -10,6 +10,7 @@
         private Button btnEdit;
         private Button btnDelete;
         private Button btnManageParticipants;
+        private Button btnAutoEmail;
         private Panel listPanel;
         private DataGridView dgvGalas;
         private DataGridViewTextBoxColumn colId;
@@ -38,6 +39,7 @@
             btnEdit = new Button();
             btnDelete = new Button();
             btnManageParticipants = new Button();
+            btnAutoEmail = new Button();
             listPanel = new Panel();
             dgvGalas = new DataGridView();
             colId = new DataGridViewTextBoxColumn();
@@ -74,6 +76,7 @@
             toolbarPanel.Controls.Add(btnEdit);
             toolbarPanel.Controls.Add(btnDelete);
             toolbarPanel.Controls.Add(btnManageParticipants);
+            toolbarPanel.Controls.Add(btnAutoEmail);
             toolbarPanel.Dock = DockStyle.Fill;
             toolbarPanel.Location = new Point(3, 3);
             toolbarPanel.Name = "toolbarPanel";
@@ -120,6 +123,16 @@
             btnManageParticipants.Text = "Manage Participants";
             btnManageParticipants.UseVisualStyleBackColor = true;
             btnManageParticipants.Click += OnManageParticipantsClick;
+
+            // btnAutoEmail
+            // 
+            btnAutoEmail.Location = new Point(491, 13);
+            btnAutoEmail.Name = "btnAutoEmail";
+            btnAutoEmail.Size = new Size(120, 28);
+            btnAutoEmail.TabIndex = 4;
+            btnAutoEmail.Text = "Auto Email";
+            btnAutoEmail.UseVisualStyleBackColor = true;
+            btnAutoEmail.Click += btnAutoEmail_Click;
             // 
             // listPanel
             // 
