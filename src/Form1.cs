@@ -189,5 +189,68 @@ namespace G_Tara
             using var participantsForm = new ParticipantsManagementForm(_participantsDataService, _currentHost);
             participantsForm.ShowDialog(this);
         }
+
+        private void btnAutoEmail_Click(object sender, EventArgs e)
+        {
+            var gala = GetSelectedGala();
+            if (gala == null)
+            {
+                MessageBox.Show("Select a gala first.");
+                return;
+            }
+
+            using (var confirmForm = new AutoEmailConfirmationForm(gala))
+            {
+                if (confirmForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    SendPlanEmailToParticipants(gala);
+                }
+            }
+        }
+
+        private void SendPlanEmailToParticipants(Gala gala)
+        {
+            var gmailParticipants = gala.Participants.Where(p => !string.IsNullOrWhiteSpace(p.Email) && p.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (!gmailParticipants.Any())
+            {
+                MessageBox.Show("No participants with Gmail addresses found.");
+                return;
+            }
+
+            string? smtpUser = Environment.GetEnvironmentVariable("GMAIL_USER");
+            string? smtpPass = Environment.GetEnvironmentVariable("GMAIL_PASS");
+            if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(smtpPass))
+            {
+                MessageBox.Show("GMAIL_USER or GMAIL_PASS environment variables not set.");
+                return;
+            }
+
+            var smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587)
+            {
+                Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass),
+                EnableSsl = true
+            };
+
+            foreach (var participant in gmailParticipants)
+            {
+                try
+                {
+                    var mail = new System.Net.Mail.MailMessage(smtpUser, participant.Email)
+                    {
+                        Subject = $"Gala Plan: {gala.Name}",
+                        Body = $"Plan Details:\n{gala.Plan}\n\nDate: {gala.ScheduledDate:yyyy-MM-dd}\nLocation: {gala.Location}",
+                    };
+                    smtp.Send(mail);
+                }
+                catch (Exception ex)
+                {
+                    string errorDetails = $"Failed to send email to {participant.Email}:\n{ex.Message}\n\n{ex.StackTrace}";
+                    MessageBox.Show(errorDetails, "SMTP Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Console.WriteLine(errorDetails);
+                }
+            }
+
+            MessageBox.Show("Plan details sent to all participants' Gmail addresses.");
+        }
+        }
     }
-}
