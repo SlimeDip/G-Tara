@@ -13,24 +13,47 @@ namespace G_Tara.Services
 
             if (weather == null) return tips;
 
-            if (weather.Description.Contains("rain"))
+            if (weather.Description.Contains("rain", StringComparison.OrdinalIgnoreCase))
                 tips.Add("Bring an umbrella!");
+
+            if (weather.Description.Contains("drizzle", StringComparison.OrdinalIgnoreCase))
+                tips.Add("Light rain expected, a small umbrella helps.");
+
+            if (weather.Description.Contains("thunder", StringComparison.OrdinalIgnoreCase) ||
+                weather.Description.Contains("storm", StringComparison.OrdinalIgnoreCase))
+                tips.Add("Consider indoor options due to storms.");
+
+            if (weather.Description.Contains("fog", StringComparison.OrdinalIgnoreCase) ||
+                weather.Description.Contains("mist", StringComparison.OrdinalIgnoreCase) ||
+                weather.Description.Contains("haze", StringComparison.OrdinalIgnoreCase))
+                tips.Add("Visibility may be low; allow extra travel time.");
 
             if (weather.Temperature >= 30)
                 tips.Add("Stay hydrated and wear light clothing!");
 
+            if (weather.Temperature >= 35)
+                tips.Add("Expect hot conditions; consider shaded areas.");
+
             if (weather.Temperature <= 20)
                 tips.Add("Stay warm and bring a jacket!");
+
+            if (weather.Temperature <= 15)
+                tips.Add("Cold day ahead; consider layered clothing.");
 
             if (weather.WindSpeed > 25)
                 tips.Add("Be cautious of strong winds!");
 
+            if (weather.WindSpeed > 35)
+                tips.Add("Secure loose items; wind may be intense.");
+
             if (weather.Humidity > 80)
                 tips.Add("Expect a humid day, stay cool!");
 
+            if (weather.Humidity < 40)
+                tips.Add("Air may be dry; bring water or lip balm.");
+
             return tips;
         }
-
 
         public WeatherService()
         {
