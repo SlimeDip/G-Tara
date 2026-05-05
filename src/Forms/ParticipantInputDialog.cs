@@ -236,11 +236,11 @@ namespace G_Tara
         {
             if (_selectedDates.Count == 0)
             {
-                txtAvailableDates.Text = "None";
+                txtAvailableDates.Text = "Pending";
                 return;
             }
 
-            txtAvailableDates.Text = string.Join(", ", _selectedDates.Select(d => d.ToString("yyyy-MM-dd")));
+            txtAvailableDates.Text = "Dates Selected";
         }
     }
 }
