@@ -5,8 +5,24 @@ namespace G_Tara.Models
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public List<DateTime> AvailableDates { get; set; } = new();
         public DateTime AvailableStartDate { get; set; }
         public DateTime AvailableEndDate { get; set; }
+
+        public bool IsAvailableOn(DateTime date)
+        {
+            if (AvailableDates.Count > 0)
+            {
+                return AvailableDates.Any(d => d.Date == date.Date);
+            }
+
+            if (AvailableStartDate != default || AvailableEndDate != default)
+            {
+                return AvailableStartDate.Date <= date.Date && AvailableEndDate.Date >= date.Date;
+            }
+
+            return false;
+        }
     }
 
     public class Gala
@@ -33,12 +49,12 @@ namespace G_Tara.Models
 
         public List<Person> GetAvailableAttendees()
         {
-            return GetAllAttendees().Where(p => p.AvailableStartDate.Date <= ScheduledDate.Date && p.AvailableEndDate.Date >= ScheduledDate.Date).ToList();
+            return GetAllAttendees().Where(p => p.IsAvailableOn(ScheduledDate)).ToList();
         }
 
         public List<Participant> GetAvailableParticipants()
         {
-            return Participants.Where(p => p.AvailableStartDate.Date <= ScheduledDate.Date && p.AvailableEndDate.Date >= ScheduledDate.Date).ToList();
+            return Participants.Where(p => p.IsAvailableOn(ScheduledDate)).ToList();
         }
 
         public bool HasOverlappingAvailability()
@@ -69,6 +85,30 @@ namespace G_Tara.Models
     public class Participant : Person
     {
         // Yooo pls magisip kayo ng something dito
+
+        public string AvailableDatesDisplay
+        {
+            get
+            {
+                if (AvailableDates.Count > 0)
+                {
+                    var ordered = AvailableDates.Select(d => d.Date).Distinct().OrderBy(d => d).ToList();
+                    var shown = ordered.Take(5).Select(d => d.ToString("yyyy-MM-dd")).ToList();
+                    if (ordered.Count > shown.Count)
+                    {
+                        shown.Add($"+{ordered.Count - shown.Count} more");
+                    }
+                    return string.Join(", ", shown);
+                }
+
+                if (AvailableStartDate != default || AvailableEndDate != default)
+                {
+                    return $"{AvailableStartDate:yyyy-MM-dd} to {AvailableEndDate:yyyy-MM-dd}";
+                }
+
+                return "None";
+            }
+        }
     }
 
     public class Host : Person

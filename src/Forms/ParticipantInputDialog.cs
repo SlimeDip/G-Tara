@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace G_Tara
@@ -9,12 +10,13 @@ namespace G_Tara
         private TextBox txtParticipantName;
         private Label lblEmail;
         private TextBox txtParticipantEmail;
-        private Label lblStartDate;
-        private DateTimePicker dtpParticipantAvailableStartDate;
-        private Label lblEndDate;
-        private DateTimePicker dtpParticipantAvailableEndDate;
+        private Label lblAvailableDates;
+        private TextBox txtAvailableDates;
+        private Button btnPickDates;
+        private Button btnClearDates;
         private Button btnOK;
         private Button btnCancel;
+        private List<DateTime> _selectedDates = new();
 
         public ParticipantInputDialog()
         {
@@ -28,10 +30,10 @@ namespace G_Tara
             this.txtParticipantName = new System.Windows.Forms.TextBox();
             this.lblEmail = new System.Windows.Forms.Label();
             this.txtParticipantEmail = new System.Windows.Forms.TextBox();
-            this.lblStartDate = new System.Windows.Forms.Label();
-            this.dtpParticipantAvailableStartDate = new System.Windows.Forms.DateTimePicker();
-            this.lblEndDate = new System.Windows.Forms.Label();
-            this.dtpParticipantAvailableEndDate = new System.Windows.Forms.DateTimePicker();
+            this.lblAvailableDates = new System.Windows.Forms.Label();
+            this.txtAvailableDates = new System.Windows.Forms.TextBox();
+            this.btnPickDates = new System.Windows.Forms.Button();
+            this.btnClearDates = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -64,37 +66,42 @@ namespace G_Tara
             this.txtParticipantEmail.Size = new System.Drawing.Size(250, 20);
             this.txtParticipantEmail.TabIndex = 3;
 
-            // lblStartDate
-            this.lblStartDate.AutoSize = true;
-            this.lblStartDate.Location = new System.Drawing.Point(12, 75);
-            this.lblStartDate.Name = "lblStartDate";
-            this.lblStartDate.Size = new System.Drawing.Size(58, 13);
-            this.lblStartDate.TabIndex = 4;
-            this.lblStartDate.Text = "Start Date:";
+            // lblAvailableDates
+            this.lblAvailableDates.AutoSize = true;
+            this.lblAvailableDates.Location = new System.Drawing.Point(12, 75);
+            this.lblAvailableDates.Name = "lblAvailableDates";
+            this.lblAvailableDates.Size = new System.Drawing.Size(81, 13);
+            this.lblAvailableDates.TabIndex = 4;
+            this.lblAvailableDates.Text = "Available Dates:";
 
-            // dtpParticipantAvailableStartDate
-            this.dtpParticipantAvailableStartDate.Location = new System.Drawing.Point(100, 72);
-            this.dtpParticipantAvailableStartDate.Name = "dtpParticipantAvailableStartDate";
-            this.dtpParticipantAvailableStartDate.Size = new System.Drawing.Size(250, 20);
-            this.dtpParticipantAvailableStartDate.TabIndex = 5;
+            // txtAvailableDates
+            this.txtAvailableDates.Location = new System.Drawing.Point(100, 72);
+            this.txtAvailableDates.Multiline = true;
+            this.txtAvailableDates.Name = "txtAvailableDates";
+            this.txtAvailableDates.ReadOnly = true;
+            this.txtAvailableDates.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtAvailableDates.Size = new System.Drawing.Size(250, 60);
+            this.txtAvailableDates.TabIndex = 5;
 
-            // lblEndDate
-            this.lblEndDate.AutoSize = true;
-            this.lblEndDate.Location = new System.Drawing.Point(12, 105);
-            this.lblEndDate.Name = "lblEndDate";
-            this.lblEndDate.Size = new System.Drawing.Size(55, 13);
-            this.lblEndDate.TabIndex = 6;
-            this.lblEndDate.Text = "End Date:";
+            // btnPickDates
+            this.btnPickDates.Location = new System.Drawing.Point(100, 138);
+            this.btnPickDates.Name = "btnPickDates";
+            this.btnPickDates.Size = new System.Drawing.Size(120, 23);
+            this.btnPickDates.TabIndex = 6;
+            this.btnPickDates.Text = "Pick Dates";
+            this.btnPickDates.UseVisualStyleBackColor = true;
 
-            // dtpParticipantAvailableEndDate
-            this.dtpParticipantAvailableEndDate.Location = new System.Drawing.Point(100, 102);
-            this.dtpParticipantAvailableEndDate.Name = "dtpParticipantAvailableEndDate";
-            this.dtpParticipantAvailableEndDate.Size = new System.Drawing.Size(250, 20);
-            this.dtpParticipantAvailableEndDate.TabIndex = 7;
+            // btnClearDates
+            this.btnClearDates.Location = new System.Drawing.Point(230, 138);
+            this.btnClearDates.Name = "btnClearDates";
+            this.btnClearDates.Size = new System.Drawing.Size(120, 23);
+            this.btnClearDates.TabIndex = 7;
+            this.btnClearDates.Text = "Clear";
+            this.btnClearDates.UseVisualStyleBackColor = true;
 
             // btnOK
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(194, 140);
+            this.btnOK.Location = new System.Drawing.Point(194, 175);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 8;
@@ -103,7 +110,7 @@ namespace G_Tara
 
             // btnCancel
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(275, 140);
+            this.btnCancel.Location = new System.Drawing.Point(275, 175);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 9;
@@ -115,13 +122,13 @@ namespace G_Tara
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(362, 175);
+            this.ClientSize = new System.Drawing.Size(362, 215);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
-            this.Controls.Add(this.dtpParticipantAvailableEndDate);
-            this.Controls.Add(this.lblEndDate);
-            this.Controls.Add(this.dtpParticipantAvailableStartDate);
-            this.Controls.Add(this.lblStartDate);
+            this.Controls.Add(this.btnClearDates);
+            this.Controls.Add(this.btnPickDates);
+            this.Controls.Add(this.txtAvailableDates);
+            this.Controls.Add(this.lblAvailableDates);
             this.Controls.Add(this.txtParticipantEmail);
             this.Controls.Add(this.lblEmail);
             this.Controls.Add(this.txtParticipantName);
@@ -149,17 +156,14 @@ namespace G_Tara
         }
 
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public DateTime ParticipantAvailableStartDate
+        public List<DateTime> ParticipantAvailableDates
         {
-            get => dtpParticipantAvailableStartDate.Value;
-            set => dtpParticipantAvailableStartDate.Value = value;
-        }
-
-        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public DateTime ParticipantAvailableEndDate
-        {
-            get => dtpParticipantAvailableEndDate.Value;
-            set => dtpParticipantAvailableEndDate.Value = value;
+            get => new List<DateTime>(_selectedDates);
+            set
+            {
+                _selectedDates = value?.Select(d => d.Date).Distinct().OrderBy(d => d).ToList() ?? new List<DateTime>();
+                UpdateAvailableDatesDisplay();
+            }
         }
 
         private void WireUiEvents()
@@ -169,6 +173,12 @@ namespace G_Tara
 
             btnCancel.Click -= OnCancelClick;
             btnCancel.Click += OnCancelClick;
+
+            btnPickDates.Click -= OnPickDatesClick;
+            btnPickDates.Click += OnPickDatesClick;
+
+            btnClearDates.Click -= OnClearDatesClick;
+            btnClearDates.Click += OnClearDatesClick;
         }
 
         private void OnOKClick(object? sender, EventArgs e)
@@ -185,6 +195,12 @@ namespace G_Tara
                 return;
             }
 
+            if (_selectedDates.Count == 0)
+            {
+                MessageBox.Show("Please pick at least one available date.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -197,8 +213,34 @@ namespace G_Tara
 
         private void ParticipantInputDialog_Load(object sender, EventArgs e)
         {
-            dtpParticipantAvailableStartDate.Value = DateTime.Now;
-            dtpParticipantAvailableEndDate.Value = DateTime.Now;
+            UpdateAvailableDatesDisplay();
+        }
+
+        private void OnPickDatesClick(object? sender, EventArgs e)
+        {
+            using var picker = new CalendarPickerForm(initialDates: _selectedDates, multiSelect: true);
+            if (picker.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            ParticipantAvailableDates = picker.SelectedDates;
+        }
+
+        private void OnClearDatesClick(object? sender, EventArgs e)
+        {
+            ParticipantAvailableDates = new List<DateTime>();
+        }
+
+        private void UpdateAvailableDatesDisplay()
+        {
+            if (_selectedDates.Count == 0)
+            {
+                txtAvailableDates.Text = "None";
+                return;
+            }
+
+            txtAvailableDates.Text = string.Join(", ", _selectedDates.Select(d => d.ToString("yyyy-MM-dd")));
         }
     }
 }

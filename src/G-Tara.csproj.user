@@ -1,28 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Compile Update="AddEditGalaForm.cs">
+    <Compile Update="Forms\AddEditGalaForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="AutoEmailConfirmationForm.cs">
+    <Compile Update="Forms\AutoEmailConfirmationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Form1.cs">
+    <Compile Update="Forms\CalendarPickerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="MapPickerForm.cs">
+    <Compile Update="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="ParticipantInputDialog.cs">
+    <Compile Update="Forms\MapPickerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="ParticipantsManagementForm.cs">
+    <Compile Update="Forms\ParticipantInputDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\ParticipantsManagementForm.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="AddEditGalaForm.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
+  <ItemGroup />
 </Project>

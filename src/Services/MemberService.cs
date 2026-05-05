@@ -8,7 +8,7 @@ namespace G_Tara.Services
         /// Checks if a person is available on the specified date.
         public bool IsAvailableOn(Person person, DateTime date)
         {
-            return person.AvailableStartDate.Date <= date.Date && person.AvailableEndDate.Date >= date.Date;
+            return person.IsAvailableOn(date);
         }
 
         /// Checks if a host manages a specific gala.

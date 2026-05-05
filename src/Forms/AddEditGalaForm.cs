@@ -18,6 +18,7 @@ namespace G_Tara
         private List<Participant> _selectedParticipants;
         private double _selectedLatitude;
         private double _selectedLongitude;
+        private DateTime _selectedDate;
         private readonly Label _lblCoordinates = new Label { AutoSize = true, Margin = new Padding(3, 7, 3, 3) };
 
         public AddEditGalaForm(Gala? gala, GalaDataService dataService, ParticipantsDataService? participantsDataService = null)
@@ -66,8 +67,8 @@ namespace G_Tara
             btnCancel.Click -= OnCancel;
             btnCancel.Click += OnCancel;
 
-            dtpDate.ValueChanged -= OnDateChangedAsync;
-            dtpDate.ValueChanged += OnDateChangedAsync;
+            btnPickDate.Click -= OnPickScheduledDate;
+            btnPickDate.Click += OnPickScheduledDate;
 
             lstSearchResults.DoubleClick -= OnLocationDoubleClick;
             lstSearchResults.DoubleClick += OnLocationDoubleClick;
@@ -130,7 +131,8 @@ namespace G_Tara
             UpdateCoordinatesLabel();
 
             txtName.Text = _gala.Name;
-            dtpDate.Value = _gala.ScheduledDate == default ? DateTime.Now : _gala.ScheduledDate;
+            var initialDate = _gala.ScheduledDate == default ? DateTime.Now : _gala.ScheduledDate;
+            SetSelectedDate(initialDate, refreshParticipants: false, updateWeather: false);
             txtLocation.Text = _gala.Location;
             if (cmbStatus.Items.Count > 0)
             {
@@ -219,16 +221,35 @@ namespace G_Tara
             btnRefreshPlaces.Text = "Refresh Locations";
         }
 
-        private async void OnDateChangedAsync(object? sender, EventArgs e)
+        private void OnPickScheduledDate(object? sender, EventArgs e)
         {
-            // Update gala scheduled date for participant filtering
-            _gala.ScheduledDate = dtpDate.Value;
+            using var picker = new CalendarPickerForm(initialDate: _selectedDate, multiSelect: false);
+            if (picker.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
 
-            // Refresh participants UI based on new date
-            RefreshParticipantsUI();
+            if (picker.SelectedDate.HasValue)
+            {
+                SetSelectedDate(picker.SelectedDate.Value);
+            }
+        }
 
-            // Update weather
-            await UpdateWeatherSilentlyAsync();
+        private void SetSelectedDate(DateTime date, bool refreshParticipants = true, bool updateWeather = true)
+        {
+            _selectedDate = date.Date;
+            _gala.ScheduledDate = _selectedDate;
+            txtScheduledDate.Text = _selectedDate.ToString("yyyy-MM-dd");
+
+            if (refreshParticipants)
+            {
+                RefreshParticipantsUI();
+            }
+
+            if (updateWeather)
+            {
+                _ = UpdateWeatherSilentlyAsync();
+            }
         }
 
         private async Task UpdateWeatherSilentlyAsync()
@@ -237,7 +258,7 @@ namespace G_Tara
 
             LogWeatherCoordinates("request_silent");
             lblWeather.Text = "Loading weather...";
-            var weather = await _weatherService.GetWeatherAsync(_selectedLatitude, _selectedLongitude, dtpDate.Value);
+            var weather = await _weatherService.GetWeatherAsync(_selectedLatitude, _selectedLongitude, _selectedDate);
             if (weather != null)
             {
                 _gala.Weather = weather;
@@ -276,7 +297,7 @@ namespace G_Tara
 
             LogWeatherCoordinates("request");
             lblWeather.Text = "Loading weather...";
-            var weather = await _weatherService.GetWeatherAsync(_selectedLatitude, _selectedLongitude, dtpDate.Value);
+            var weather = await _weatherService.GetWeatherAsync(_selectedLatitude, _selectedLongitude, _selectedDate);
             if (weather != null)
             {
                 _gala.Weather = weather;
@@ -350,7 +371,7 @@ namespace G_Tara
         private void LoadParticipantsForGala()
         {
             // Ensure gala scheduled date is set to current picker value
-            _gala.ScheduledDate = dtpDate.Value;
+            _gala.ScheduledDate = _selectedDate;
 
             _availableParticipants = _participantsDataService.LoadParticipants();
             RefreshParticipantsUI();
@@ -359,11 +380,11 @@ namespace G_Tara
         private void RefreshParticipantsUI()
         {
             // Get the currently selected gala date
-            DateTime galaDate = dtpDate.Value.Date;
+            DateTime galaDate = _selectedDate.Date;
 
             // Filter participants to show only those available on the gala date
             var availableForDate = _availableParticipants
-                .Where(p => p.AvailableStartDate.Date <= galaDate && p.AvailableEndDate.Date >= galaDate)
+                .Where(p => p.IsAvailableOn(galaDate))
                 .ToList();
 
             // Store participants that are no longer available due to date change
@@ -433,7 +454,7 @@ namespace G_Tara
         private void OnSave(object sender, EventArgs e)
         {
             _gala.Name = txtName.Text.Trim();
-            _gala.ScheduledDate = dtpDate.Value;
+            _gala.ScheduledDate = _selectedDate;
             _gala.Location = txtLocation.Text.Trim();
             _gala.Latitude = _selectedLatitude;
             _gala.Longitude = _selectedLongitude;

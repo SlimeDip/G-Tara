@@ -24,7 +24,9 @@ namespace G_Tara.Services
                 if (File.Exists(ParticipantsFilePath))
                 {
                     var json = File.ReadAllText(ParticipantsFilePath);
-                    return JsonSerializer.Deserialize<List<Participant>>(json) ?? new List<Participant>();
+                    var participants = JsonSerializer.Deserialize<List<Participant>>(json) ?? new List<Participant>();
+                    NormalizeAvailability(participants);
+                    return participants;
                 }
             }
             catch (Exception ex)
@@ -49,11 +51,13 @@ namespace G_Tara.Services
                 participants.Add(participant);
             }
 
+            NormalizeAvailability(participants);
             SaveAllParticipants(participants);
         }
 
         public void SaveParticipants(List<Participant> participants)
         {
+            NormalizeAvailability(participants);
             SaveAllParticipants(participants);
         }
 
@@ -83,6 +87,37 @@ namespace G_Tara.Services
                 p.Name.ToLower().Contains(term) ||
                 p.Email.ToLower().Contains(term)
             ).ToList();
+        }
+
+        private void NormalizeAvailability(List<Participant> participants)
+        {
+            foreach (var participant in participants)
+            {
+                if (participant.AvailableDates == null)
+                {
+                    participant.AvailableDates = new List<DateTime>();
+                }
+
+                if (participant.AvailableDates.Count == 0 && participant.AvailableStartDate != default && participant.AvailableEndDate != default)
+                {
+                    var start = participant.AvailableStartDate.Date;
+                    var end = participant.AvailableEndDate.Date;
+                    if (end < start)
+                    {
+                        var temp = start;
+                        start = end;
+                        end = temp;
+                    }
+
+                    var dates = new List<DateTime>();
+                    for (var day = start; day <= end; day = day.AddDays(1))
+                    {
+                        dates.Add(day);
+                    }
+
+                    participant.AvailableDates = dates;
+                }
+            }
         }
 
         private void SaveAllParticipants(List<Participant> participants)

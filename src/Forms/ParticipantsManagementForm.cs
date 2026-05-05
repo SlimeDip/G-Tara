@@ -82,8 +82,7 @@ namespace G_Tara
 
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Name", Width = 150 });
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Email", HeaderText = "Email", Width = 200 });
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "AvailableStartDate", HeaderText = "Start Date", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "yyyy-MM-dd" } });
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "AvailableEndDate", HeaderText = "End Date", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "yyyy-MM-dd" } });
+            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "AvailableDatesDisplay", HeaderText = "Available Dates", Width = 220 });
 
             dgvParticipants.SelectionChanged += OnParticipantSelectionChanged;
 
@@ -148,8 +147,7 @@ namespace G_Tara
                 {
                     Name = dialog.ParticipantName,
                     Email = dialog.ParticipantEmail,
-                    AvailableStartDate = dialog.ParticipantAvailableStartDate,
-                    AvailableEndDate = dialog.ParticipantAvailableEndDate
+                    AvailableDates = dialog.ParticipantAvailableDates
                 };
                 _dataService.SaveParticipant(participant);
                 LoadParticipants();
@@ -168,16 +166,14 @@ namespace G_Tara
             {
                 ParticipantName = participant.Name,
                 ParticipantEmail = participant.Email,
-                ParticipantAvailableStartDate = participant.AvailableStartDate,
-                ParticipantAvailableEndDate = participant.AvailableEndDate
+                ParticipantAvailableDates = participant.AvailableDates
             };
 
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
                 participant.Name = dialog.ParticipantName;
                 participant.Email = dialog.ParticipantEmail;
-                participant.AvailableStartDate = dialog.ParticipantAvailableStartDate;
-                participant.AvailableEndDate = dialog.ParticipantAvailableEndDate;
+                participant.AvailableDates = dialog.ParticipantAvailableDates;
                 _dataService.SaveParticipant(participant);
                 LoadParticipants();
                 txtSearch.Clear();

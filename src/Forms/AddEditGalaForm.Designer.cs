@@ -12,7 +12,9 @@ namespace G_Tara
         private Label lblName;
         private TextBox txtName;
         private Label lblDate;
-        private DateTimePicker dtpDate;
+        private FlowLayoutPanel datePanel;
+        private TextBox txtScheduledDate;
+        private Button btnPickDate;
         private Label lblStatus;
         private ComboBox cmbStatus;
         private Label lblLocation;
@@ -58,7 +60,9 @@ namespace G_Tara
             lblName = new Label();
             txtName = new TextBox();
             lblDate = new Label();
-            dtpDate = new DateTimePicker();
+            datePanel = new FlowLayoutPanel();
+            txtScheduledDate = new TextBox();
+            btnPickDate = new Button();
             lblStatus = new Label();
             cmbStatus = new ComboBox();
             lblLocation = new Label();
@@ -88,6 +92,7 @@ namespace G_Tara
             container.SuspendLayout();
             scrollPanel.SuspendLayout();
             mainPanel.SuspendLayout();
+            datePanel.SuspendLayout();
             locationPanel.SuspendLayout();
             weatherPanel.SuspendLayout();
             buttonPanel.SuspendLayout();
@@ -127,7 +132,7 @@ namespace G_Tara
             mainPanel.Controls.Add(lblName, 0, 0);
             mainPanel.Controls.Add(txtName, 1, 0);
             mainPanel.Controls.Add(lblDate, 0, 1);
-            mainPanel.Controls.Add(dtpDate, 1, 1);
+            mainPanel.Controls.Add(datePanel, 1, 1);
             mainPanel.Controls.Add(lblStatus, 0, 2);
             mainPanel.Controls.Add(cmbStatus, 1, 2);
             mainPanel.Controls.Add(lblLocation, 0, 3);
@@ -195,13 +200,36 @@ namespace G_Tara
             lblDate.TabIndex = 2;
             lblDate.Text = "Scheduled Date:";
             // 
-            // dtpDate
+            // datePanel
             // 
-            dtpDate.Dock = DockStyle.Left;
-            dtpDate.Location = new Point(165, 57);
-            dtpDate.Name = "dtpDate";
-            dtpDate.Size = new Size(260, 23);
-            dtpDate.TabIndex = 3;
+            datePanel.AutoSize = true;
+            datePanel.Dock = DockStyle.Fill;
+            datePanel.Location = new Point(165, 57);
+            datePanel.Name = "datePanel";
+            datePanel.Size = new Size(497, 36);
+            datePanel.TabIndex = 3;
+            // 
+            // txtScheduledDate
+            // 
+            txtScheduledDate.Location = new Point(3, 3);
+            txtScheduledDate.Name = "txtScheduledDate";
+            txtScheduledDate.ReadOnly = true;
+            txtScheduledDate.Size = new Size(160, 23);
+            txtScheduledDate.TabIndex = 0;
+            // 
+            // btnPickDate
+            // 
+            btnPickDate.Location = new Point(169, 3);
+            btnPickDate.Name = "btnPickDate";
+            btnPickDate.Size = new Size(95, 23);
+            btnPickDate.TabIndex = 1;
+            btnPickDate.Text = "Pick Date";
+            btnPickDate.UseVisualStyleBackColor = true;
+            // 
+            // datePanel
+            // 
+            datePanel.Controls.Add(txtScheduledDate);
+            datePanel.Controls.Add(btnPickDate);
             // 
             // lblStatus
             // 
@@ -475,6 +503,8 @@ namespace G_Tara
             scrollPanel.PerformLayout();
             mainPanel.ResumeLayout(false);
             mainPanel.PerformLayout();
+            datePanel.ResumeLayout(false);
+            datePanel.PerformLayout();
             locationPanel.ResumeLayout(false);
             locationPanel.PerformLayout();
             weatherPanel.ResumeLayout(false);
