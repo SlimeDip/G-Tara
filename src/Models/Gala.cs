@@ -30,6 +30,8 @@ namespace G_Tara.Models
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = string.Empty;
         public DateTime ScheduledDate { get; set; }
+        public DateTime RangeStartDate { get; set; }
+        public DateTime RangeEndDate { get; set; }
         public string Location { get; set; } = string.Empty;
         public double Latitude { get; set; }
         public double Longitude { get; set; }
@@ -93,12 +95,14 @@ namespace G_Tara.Models
                 if (AvailableDates.Count > 0)
                 {
                     var ordered = AvailableDates.Select(d => d.Date).Distinct().OrderBy(d => d).ToList();
-                    var shown = ordered.Take(5).Select(d => d.ToString("yyyy-MM-dd")).ToList();
-                    if (ordered.Count > shown.Count)
-                    {
-                        shown.Add($"+{ordered.Count - shown.Count} more");
-                    }
-                    return string.Join(", ", shown);
+                    var first = ordered[0];
+                    var last = ordered[ordered.Count - 1];
+                    var range = first == last
+                        ? first.ToString("MMM d, yyyy")
+                        : $"{first:MMM d, yyyy} - {last:MMM d, yyyy}";
+                    return ordered.Count == 1
+                        ? range
+                        : $"{ordered.Count} dates ({range})";
                 }
 
                 if (AvailableStartDate != default || AvailableEndDate != default)

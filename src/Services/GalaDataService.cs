@@ -12,9 +12,11 @@ namespace G_Tara.Services
         {
             var galas = LoadGalas();
 
+            var (newStart, newEnd) = GetGalaDateRange(newGala);
+
             return galas.Any(g =>
                 g.Id != newGala.Id &&
-                g.ScheduledDate.Date == newGala.ScheduledDate.Date
+                RangesOverlap(newStart, newEnd, GetGalaDateRange(g))
             );
         }
 
@@ -22,9 +24,11 @@ namespace G_Tara.Services
         {
             var galas = LoadGalas();
 
+            var (newStart, newEnd) = GetGalaDateRange(newGala);
+
             return galas.Where(g =>
                 g.Id != newGala.Id &&
-                g.ScheduledDate.Date == newGala.ScheduledDate.Date
+                RangesOverlap(newStart, newEnd, GetGalaDateRange(g))
             ).ToList();
         }
 
@@ -70,9 +74,11 @@ namespace G_Tara.Services
         {
             var galas = LoadGalas();
 
+            var (newStart, newEnd) = GetGalaDateRange(gala);
+
             var conflictingGala = galas.FirstOrDefault(g =>
                 g.Id != gala.Id &&
-                g.ScheduledDate.Date == gala.ScheduledDate.Date
+                RangesOverlap(newStart, newEnd, GetGalaDateRange(g))
             );
 
             if (conflictingGala != null) //Added: Throws a specific exception if a conflict is detected
@@ -84,7 +90,7 @@ namespace G_Tara.Services
 
             var conflicts = galas.Where(g =>
                 g.Id != gala.Id &&
-                g.ScheduledDate.Date == gala.ScheduledDate.Date
+                RangesOverlap(newStart, newEnd, GetGalaDateRange(g))
             ).ToList();
 
             var existing = galas.FirstOrDefault(g => g.Id == gala.Id);
@@ -98,6 +104,30 @@ namespace G_Tara.Services
             SaveGalas(galas);
 
             return conflicts;
+        }
+
+        private static (DateTime Start, DateTime End) GetGalaDateRange(Gala gala)
+        {
+            var start = gala.RangeStartDate != default
+                ? gala.RangeStartDate.Date
+                : gala.ScheduledDate.Date;
+            var end = gala.RangeEndDate != default
+                ? gala.RangeEndDate.Date
+                : start;
+
+            if (end < start)
+            {
+                var temp = start;
+                start = end;
+                end = temp;
+            }
+
+            return (start, end);
+        }
+
+        private static bool RangesOverlap(DateTime startA, DateTime endA, (DateTime Start, DateTime End) rangeB)
+        {
+            return startA <= rangeB.End && endA >= rangeB.Start;
         }
 
         public void DeleteGala(string id)

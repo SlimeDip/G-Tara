@@ -19,6 +19,8 @@ namespace G_Tara
         private double _selectedLatitude;
         private double _selectedLongitude;
         private DateTime _selectedDate;
+        private DateTime _rangeStart;
+        private DateTime _rangeEnd;
         private readonly Label _lblCoordinates = new Label { AutoSize = true, Margin = new Padding(3, 7, 3, 3) };
 
         public AddEditGalaForm(Gala? gala, GalaDataService dataService, ParticipantsDataService? participantsDataService = null)
@@ -67,8 +69,8 @@ namespace G_Tara
             btnCancel.Click -= OnCancel;
             btnCancel.Click += OnCancel;
 
-            btnPickDate.Click -= OnPickScheduledDate;
-            btnPickDate.Click += OnPickScheduledDate;
+            btnPickRange.Click -= OnPickDateRange;
+            btnPickRange.Click += OnPickDateRange;
 
             lstSearchResults.DoubleClick -= OnLocationDoubleClick;
             lstSearchResults.DoubleClick += OnLocationDoubleClick;
@@ -132,7 +134,13 @@ namespace G_Tara
 
             txtName.Text = _gala.Name;
             var initialDate = _gala.ScheduledDate == default ? DateTime.Now : _gala.ScheduledDate;
-            SetSelectedDate(initialDate, refreshParticipants: false, updateWeather: false);
+            _selectedDate = initialDate.Date;
+            _gala.ScheduledDate = _selectedDate;
+            SetDateRange(
+                _gala.RangeStartDate == default ? initialDate : _gala.RangeStartDate,
+                _gala.RangeEndDate == default ? initialDate : _gala.RangeEndDate,
+                refreshParticipants: false,
+                updateWeather: false);
             txtLocation.Text = _gala.Location;
             if (cmbStatus.Items.Count > 0)
             {
@@ -221,25 +229,41 @@ namespace G_Tara
             btnRefreshPlaces.Text = "Refresh Locations";
         }
 
-        private void OnPickScheduledDate(object? sender, EventArgs e)
+        private void OnPickDateRange(object? sender, EventArgs e)
         {
-            using var picker = new CalendarPickerForm(initialDate: _selectedDate, multiSelect: false);
+            var initialDates = BuildRangeDates(_rangeStart, _rangeEnd);
+            using var picker = new CalendarPickerForm(initialDates: initialDates, multiSelect: true);
             if (picker.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }
 
-            if (picker.SelectedDate.HasValue)
+            if (picker.SelectedDates.Count > 0)
             {
-                SetSelectedDate(picker.SelectedDate.Value);
+                var start = picker.SelectedDates.Min().Date;
+                var end = picker.SelectedDates.Max().Date;
+                SetDateRange(start, end);
             }
         }
 
-        private void SetSelectedDate(DateTime date, bool refreshParticipants = true, bool updateWeather = true)
+        private void SetDateRange(DateTime start, DateTime end, bool refreshParticipants = true, bool updateWeather = true)
         {
-            _selectedDate = date.Date;
-            _gala.ScheduledDate = _selectedDate;
-            txtScheduledDate.Text = _selectedDate.ToString("yyyy-MM-dd");
+            if (end < start)
+            {
+                var temp = start;
+                start = end;
+                end = temp;
+            }
+
+            _rangeStart = start.Date;
+            _rangeEnd = end.Date;
+            _selectedDate = _rangeStart;
+            _gala.RangeStartDate = _rangeStart;
+            _gala.RangeEndDate = _rangeEnd;
+            _gala.ScheduledDate = _rangeStart;
+            txtDateRange.Text = _rangeStart == _rangeEnd
+                ? _rangeStart.ToString("yyyy-MM-dd")
+                : $"{_rangeStart:yyyy-MM-dd} to {_rangeEnd:yyyy-MM-dd}";
 
             if (refreshParticipants)
             {
@@ -250,6 +274,25 @@ namespace G_Tara
             {
                 _ = UpdateWeatherSilentlyAsync();
             }
+        }
+
+        private static List<DateTime> BuildRangeDates(DateTime start, DateTime end)
+        {
+            var dates = new List<DateTime>();
+            if (start == default || end == default)
+            {
+                return dates;
+            }
+
+            var cursor = start <= end ? start.Date : end.Date;
+            var last = start <= end ? end.Date : start.Date;
+            while (cursor <= last)
+            {
+                dates.Add(cursor);
+                cursor = cursor.AddDays(1);
+            }
+
+            return dates;
         }
 
         private async Task UpdateWeatherSilentlyAsync()
@@ -374,7 +417,39 @@ namespace G_Tara
             _gala.ScheduledDate = _selectedDate;
 
             _availableParticipants = _participantsDataService.LoadParticipants();
+            RefreshHostOptions();
             RefreshParticipantsUI();
+        }
+
+        private void RefreshHostOptions()
+        {
+            var selectedId = (cmbHost.SelectedItem as Participant)?.Id;
+
+            cmbHost.DataSource = null;
+            cmbHost.DisplayMember = "Name";
+            cmbHost.ValueMember = "Id";
+            cmbHost.DataSource = new List<Participant>(_availableParticipants);
+
+            Participant? toSelect = null;
+            if (!string.IsNullOrWhiteSpace(_gala.HostName))
+            {
+                toSelect = _availableParticipants.FirstOrDefault(p =>
+                    string.Equals(p.Name, _gala.HostName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (toSelect == null && !string.IsNullOrWhiteSpace(selectedId))
+            {
+                toSelect = _availableParticipants.FirstOrDefault(p => p.Id == selectedId);
+            }
+
+            if (toSelect != null)
+            {
+                cmbHost.SelectedItem = toSelect;
+            }
+            else if (cmbHost.Items.Count > 0)
+            {
+                cmbHost.SelectedIndex = 0;
+            }
         }
 
         private void RefreshParticipantsUI()
@@ -462,6 +537,16 @@ namespace G_Tara
             _gala.Plan = txtPlan.Text.Trim();
             _gala.LocationItems = _selectedLocations;
             _gala.Participants = _selectedParticipants;
+            _gala.RangeStartDate = _rangeStart;
+            _gala.RangeEndDate = _rangeEnd;
+            if (cmbHost.SelectedItem is Participant selectedHost)
+            {
+                _gala.HostName = selectedHost.Name;
+            }
+            else
+            {
+                _gala.HostName = string.Empty;
+            }
 
             if (string.IsNullOrWhiteSpace(_gala.Name))
             {

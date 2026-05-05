@@ -13,8 +13,8 @@ namespace G_Tara
         private TextBox txtName;
         private Label lblDate;
         private FlowLayoutPanel datePanel;
-        private TextBox txtScheduledDate;
-        private Button btnPickDate;
+        private TextBox txtDateRange;
+        private Button btnPickRange;
         private Label lblStatus;
         private ComboBox cmbStatus;
         private Label lblLocation;
@@ -42,6 +42,8 @@ namespace G_Tara
 
         private Label lblParticipants;
         private CheckedListBox chkParticipants;
+        private Label lblHost;
+        private ComboBox cmbHost;
 
         protected override void Dispose(bool disposing)
         {
@@ -61,8 +63,8 @@ namespace G_Tara
             txtName = new TextBox();
             lblDate = new Label();
             datePanel = new FlowLayoutPanel();
-            txtScheduledDate = new TextBox();
-            btnPickDate = new Button();
+            txtDateRange = new TextBox();
+            btnPickRange = new Button();
             lblStatus = new Label();
             cmbStatus = new ComboBox();
             lblLocation = new Label();
@@ -86,6 +88,8 @@ namespace G_Tara
             btnRefreshPlaces = new Button();
             lblParticipants = new Label();
             chkParticipants = new CheckedListBox();
+            lblHost = new Label();
+            cmbHost = new ComboBox();
             buttonPanel = new FlowLayoutPanel();
             btnSave = new Button();
             btnCancel = new Button();
@@ -150,13 +154,15 @@ namespace G_Tara
             mainPanel.Controls.Add(weatherPanel, 1, 9);
             mainPanel.Controls.Add(lblPlan, 0, 10);
             mainPanel.Controls.Add(txtPlan, 1, 10);
-            mainPanel.Controls.Add(lblParticipants, 0, 11);
-            mainPanel.Controls.Add(chkParticipants, 1, 11);
+            mainPanel.Controls.Add(lblHost, 0, 11);
+            mainPanel.Controls.Add(cmbHost, 1, 11);
+            mainPanel.Controls.Add(lblParticipants, 0, 12);
+            mainPanel.Controls.Add(chkParticipants, 1, 12);
             mainPanel.Dock = DockStyle.Top;
             mainPanel.Location = new Point(0, 0);
             mainPanel.Name = "mainPanel";
             mainPanel.Padding = new Padding(12);
-            mainPanel.RowCount = 12;
+            mainPanel.RowCount = 13;
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
@@ -168,6 +174,7 @@ namespace G_Tara
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 56F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 170F));
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 170F));
             mainPanel.Size = new Size(677, 850);
             mainPanel.TabIndex = 0;
@@ -198,7 +205,7 @@ namespace G_Tara
             lblDate.Name = "lblDate";
             lblDate.Size = new Size(92, 15);
             lblDate.TabIndex = 2;
-            lblDate.Text = "Scheduled Date:";
+            lblDate.Text = "Date Range:";
             // 
             // datePanel
             // 
@@ -209,27 +216,28 @@ namespace G_Tara
             datePanel.Size = new Size(497, 36);
             datePanel.TabIndex = 3;
             // 
-            // txtScheduledDate
             // 
-            txtScheduledDate.Location = new Point(3, 3);
-            txtScheduledDate.Name = "txtScheduledDate";
-            txtScheduledDate.ReadOnly = true;
-            txtScheduledDate.Size = new Size(160, 23);
-            txtScheduledDate.TabIndex = 0;
+            // txtDateRange
             // 
-            // btnPickDate
+            txtDateRange.Location = new Point(3, 3);
+            txtDateRange.Name = "txtDateRange";
+            txtDateRange.ReadOnly = true;
+            txtDateRange.Size = new Size(240, 23);
+            txtDateRange.TabIndex = 0;
             // 
-            btnPickDate.Location = new Point(169, 3);
-            btnPickDate.Name = "btnPickDate";
-            btnPickDate.Size = new Size(95, 23);
-            btnPickDate.TabIndex = 1;
-            btnPickDate.Text = "Pick Date";
-            btnPickDate.UseVisualStyleBackColor = true;
+            // btnPickRange
+            // 
+            btnPickRange.Location = new Point(249, 3);
+            btnPickRange.Name = "btnPickRange";
+            btnPickRange.Size = new Size(95, 23);
+            btnPickRange.TabIndex = 1;
+            btnPickRange.Text = "Pick Dates";
+            btnPickRange.UseVisualStyleBackColor = true;
             // 
             // datePanel
             // 
-            datePanel.Controls.Add(txtScheduledDate);
-            datePanel.Controls.Add(btnPickDate);
+            datePanel.Controls.Add(txtDateRange);
+            datePanel.Controls.Add(btnPickRange);
             // 
             // lblStatus
             // 
@@ -442,7 +450,7 @@ namespace G_Tara
             // 
             lblParticipants.Anchor = AnchorStyles.Left;
             lblParticipants.AutoSize = true;
-            lblParticipants.Location = new Point(15, 867);
+            lblParticipants.Location = new Point(15, 909);
             lblParticipants.Name = "lblParticipants";
             lblParticipants.Size = new Size(138, 15);
             lblParticipants.TabIndex = 20;
@@ -452,10 +460,30 @@ namespace G_Tara
             // 
             chkParticipants.Dock = DockStyle.Fill;
             chkParticipants.FormattingEnabled = true;
-            chkParticipants.Location = new Point(165, 857);
+            chkParticipants.Location = new Point(165, 899);
             chkParticipants.Name = "chkParticipants";
             chkParticipants.Size = new Size(497, 129);
             chkParticipants.TabIndex = 21;
+            // 
+            // lblHost
+            // 
+            lblHost.Anchor = AnchorStyles.Left;
+            lblHost.AutoSize = true;
+            lblHost.Location = new Point(15, 867);
+            lblHost.Name = "lblHost";
+            lblHost.Size = new Size(38, 15);
+            lblHost.TabIndex = 22;
+            lblHost.Text = "Host:";
+            // 
+            // cmbHost
+            // 
+            cmbHost.Dock = DockStyle.Left;
+            cmbHost.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbHost.FormattingEnabled = true;
+            cmbHost.Location = new Point(165, 857);
+            cmbHost.Name = "cmbHost";
+            cmbHost.Size = new Size(240, 23);
+            cmbHost.TabIndex = 23;
             // 
             // buttonPanel
             // 

@@ -82,9 +82,18 @@ namespace G_Tara
 
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Name", Width = 150 });
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Email", HeaderText = "Email", Width = 200 });
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "AvailableDatesDisplay", HeaderText = "Available Dates", Width = 220 });
+            dgvParticipants.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = "colAvailableDates",
+                DataPropertyName = "AvailableDatesDisplay",
+                HeaderText = "Available Dates",
+                Width = 220,
+                FlatStyle = FlatStyle.Flat,
+                UseColumnTextForButtonValue = false
+            });
 
             dgvParticipants.SelectionChanged += OnParticipantSelectionChanged;
+            dgvParticipants.CellContentClick += OnParticipantsGridCellContentClick;
 
             var buttonPanel = new FlowLayoutPanel
             {
@@ -200,6 +209,27 @@ namespace G_Tara
             var enabled = dgvParticipants.SelectedRows.Count > 0;
             btnEdit.Enabled = enabled;
             btnRemove.Enabled = enabled;
+        }
+
+        private void OnParticipantsGridCellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            if (dgvParticipants.Columns[e.ColumnIndex].Name != "colAvailableDates")
+            {
+                return;
+            }
+
+            if (dgvParticipants.Rows[e.RowIndex].DataBoundItem is not Participant participant)
+            {
+                return;
+            }
+
+            using var picker = new CalendarPickerForm(initialDates: participant.AvailableDates, multiSelect: true);
+            picker.ShowDialog(this);
         }
     }
 }

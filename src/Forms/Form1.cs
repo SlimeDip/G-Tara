@@ -219,6 +219,11 @@ namespace G_Tara
                 return;
             }
 
+            var hostName = !string.IsNullOrWhiteSpace(gala.HostName)
+                ? gala.HostName
+                : _currentHost?.Name ?? "Host";
+            var hostEmail = _currentHost?.Email ?? string.Empty;
+
             string? smtpUser = Environment.GetEnvironmentVariable("GMAIL_USER");
             string? smtpPass = Environment.GetEnvironmentVariable("GMAIL_PASS");
             if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(smtpPass))
@@ -243,7 +248,23 @@ namespace G_Tara
                 ? _weatherService.GetWeatherTips(weather)
                 : new List<string> { "Weather data unavailable. Please check conditions manually." };
 
-            string tipSection = string.Join("\n- ", tips); 
+            var extraTips = BuildAdditionalTips(gala, weather);
+            var allTips = tips
+                .Concat(extraTips)
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Distinct()
+                .ToList();
+
+            if (allTips.Count == 0)
+            {
+                allTips.Add("Please check details and reach out to the host if anything changes.");
+            }
+
+            string tipSection = string.Join("\n- ", allTips);
+
+            var weatherSummary = weather != null
+                ? $"{weather.Description}, {weather.Temperature}°C, Humidity {weather.Humidity}%, Wind {weather.WindSpeed} km/h"
+                : "Weather data unavailable.";
 
 
             foreach (var participant in gmailParticipants)
@@ -254,9 +275,22 @@ namespace G_Tara
                     {                        
                         Subject = $"Gala Plan: {gala.Name}",
                         Body = $"Tara na, {participant.Name}!\n" +
-                        $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n\n" +
-                        $"Here are the Gala Details:\n{gala.Plan}\n\nDate: {gala.ScheduledDate:yyyy-MM-dd}\nLocation: {gala.Location} \n\nRecommendations:\n- {tipSection}" +
-                        $"\nPrepare accordingly! Keep safe and don't forget to have Fun!\n" +
+                        $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n" +
+                        $"Here are the Gala Details:\n\n" +
+                        $"GALA DETAILS\n" +
+                        $"Name: {gala.Name}\n" +
+                        $"Date: {gala.ScheduledDate:yyyy-MM-dd}\n" +
+                        $"Location: {gala.Location}\n" +
+                        $"Plan: {gala.Plan}\n\n" +
+                        $"HOST\n" +
+                        $"Organizer: {hostName}\n" +
+                        (string.IsNullOrWhiteSpace(hostEmail) ? string.Empty : $"Contact: {hostEmail}\n") +
+                        $"\n" +
+                        $"WEATHER\n" +
+                        $"Forecast: {weatherSummary}\n\n" +
+                        $"RECOMMENDATIONS\n" +
+                        $"- {tipSection}\n\n" +
+                        $"If you have any questions or updates, please reach out to the host.\n" +
                         $"\nAno G? Tara!",
                     };
                     smtp.Send(mail);
@@ -270,6 +304,53 @@ namespace G_Tara
             }
 
             MessageBox.Show("Plan details sent to all participants' Gmail addresses.");
+        }
+
+        private List<string> BuildAdditionalTips(Gala gala, WeatherData? weather)
+        {
+            var tips = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(gala.Location))
+            {
+                tips.Add($"Confirm the meeting point around {gala.Location}.");
+            }
+
+            if (gala.LocationItems != null && gala.LocationItems.Count > 0)
+            {
+                var suggested = gala.LocationItems
+                    .Select(l => l.Name)
+                    .Where(n => !string.IsNullOrWhiteSpace(n))
+                    .Distinct()
+                    .Take(3)
+                    .ToList();
+
+                if (suggested.Count > 0)
+                {
+                    tips.Add($"Suggested nearby spots: {string.Join(", ", suggested)}.");
+                }
+            }
+
+            if (gala.Participants != null && gala.Participants.Count >= 8)
+            {
+                tips.Add("Consider coordinating transport or carpooling for a smoother arrival.");
+            }
+
+            if (gala.Participants == null || gala.Participants.Count == 0)
+            {
+                tips.Add("Invite participants so everyone receives the latest plan.");
+            }
+
+            if (weather != null && weather.Description.Contains("rain", StringComparison.OrdinalIgnoreCase))
+            {
+                tips.Add("Plan a covered meet-up spot in case of rain.");
+            }
+
+            if (weather != null && weather.Description.Contains("clear", StringComparison.OrdinalIgnoreCase))
+            {
+                tips.Add("If outdoors, bring sun protection and water.");
+            }
+
+            return tips;
         }
         }
     }
