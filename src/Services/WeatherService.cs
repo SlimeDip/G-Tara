@@ -7,7 +7,7 @@ namespace G_Tara.Services
         private readonly string _apiKey;
         private readonly HttpClient _httpClient;
 
-        public List<string> GetWeatherTips(WeatherData weather)//Gives tips depending on the weather or temperature
+        public List<string> GetWeatherTips(WeatherData weather)
         {
             var tips = new List<string>();
 
@@ -51,6 +51,62 @@ namespace G_Tara.Services
 
             if (weather.Humidity < 40)
                 tips.Add("Air may be dry; bring water or lip balm.");
+
+            return tips;
+        }
+
+        public List<string> GetEmailTips(Gala gala, WeatherData? weather)
+        {
+            var tips = new List<string>();
+
+            if (weather != null)
+            {
+                tips.AddRange(GetWeatherTips(weather));
+            }
+            else
+            {
+                tips.Add("Weather data unavailable. Please check conditions manually.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(gala.Location))
+            {
+                tips.Add($"Confirm the meeting point around {gala.Location}.");
+            }
+
+            if (gala.LocationItems != null && gala.LocationItems.Count > 0)
+            {
+                var suggested = gala.LocationItems
+                    .Select(l => l.Name)
+                    .Where(n => !string.IsNullOrWhiteSpace(n))
+                    .Distinct()
+                    .Take(3)
+                    .ToList();
+
+                if (suggested.Count > 0)
+                {
+                    tips.Add($"Suggested nearby spots: {string.Join(", ", suggested)}.");
+                }
+            }
+
+            if (gala.Participants != null && gala.Participants.Count >= 8)
+            {
+                tips.Add("Consider coordinating transport or carpooling for a smoother arrival.");
+            }
+
+            if (gala.Participants == null || gala.Participants.Count == 0)
+            {
+                tips.Add("Invite participants so everyone receives the latest plan.");
+            }
+
+            if (weather != null && weather.Description.Contains("rain", StringComparison.OrdinalIgnoreCase))
+            {
+                tips.Add("Plan a covered meet-up spot in case of rain.");
+            }
+
+            if (weather != null && weather.Description.Contains("clear", StringComparison.OrdinalIgnoreCase))
+            {
+                tips.Add("If outdoors, bring sun protection and water.");
+            }
 
             return tips;
         }

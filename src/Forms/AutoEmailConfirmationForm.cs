@@ -6,11 +6,12 @@ namespace G_Tara
 {
     public partial class AutoEmailConfirmationForm : Form
     {
-        public AutoEmailConfirmationForm(Gala gala)
+        public AutoEmailConfirmationForm(Gala gala, string hostEmail)
         {
             InitializeComponent();
             txtPlanDetails.Text = gala.Plan;
             txtParticipants.Text = string.Join("\r\n", gala.Participants.Select(p => p.Email));
+            txtHostEmail.Text = string.IsNullOrWhiteSpace(hostEmail) ? "Not set" : hostEmail;
         }
 
         public bool IsConfirmed => DialogResult == DialogResult.OK;

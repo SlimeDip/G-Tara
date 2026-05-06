@@ -9,16 +9,16 @@ G-Tara is a Windows Forms application for planning and coordinating galas. Hosts
 In G-Tara, users organize a gala from start to finish. They pick dates, locations, and participants, then finalize a plan with weather-aware tips and optional email updates.
 
 **Highlights:**
-- Gala scheduling with date ranges
-- Participant management with availability
-- Location search and map pinning
-- Weather lookup for the event date
-- Optional email dispatch to Gmail participants
+- 📅 Gala scheduling with date ranges
+- ⌚ Participant management with availability
+- 📍 Location search and map pinning
+- ⛅ Weather lookup for the event date
+- ✉️ Optional email dispatch to Gmail participants
 
 ---
 
 ## UML Diagram
-![UML_Diagram](static/UML.png "UML_Diagram")
+![UML_Diagram](static/UML_Diagram.png "UML_Diagram")
 
 ## Features and Functionalities of the System
 - Create, edit, and delete galas with date ranges and plans.
@@ -32,6 +32,7 @@ In G-Tara, users organize a gala from start to finish. They pick dates, location
 - Add/Edit Gala handles date selection, location lookup, and participant selection.
 - Services persist data to JSON files and call external APIs for weather and location search.
 - Participants are managed in a dedicated dialog with availability selection.
+- Users can pick galas and automatically send them to the listed participants of the said gala.
 
 ## OOP Principles Used
 ### Encapsulation
@@ -143,5 +144,62 @@ public class Host : Person
    - Optional: `SAVE_DIR` to override the default save folder.
 4. Build and run the project.
 
-## Names of the Developers or Team Members
-- [Add developer names here]
+## ✨ Authors & Credits
+
+<div align="center">
+
+<table>
+  <tr>
+    <td align="center" width="180">
+      <img src="static/Majol.png" alt="Majol" width="120"/><br/>
+      <strong>Marjol Alvendia</strong><br/>
+      Debugger / Developer<br/>
+      <a href="https://github.com/ShinHank" target="_blank">
+        <img src="https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+      </a>
+    </td>
+    <td align="center" width="180">
+      <img src="static/Migo.jpg" alt="Juan Miguel" width="120"/><br/>
+      <strong>Juan Miguel Andal</strong><br/>
+      Quality Assurance / Developer<br/>
+      <a href="https://github.com/JuanMiguelAndal" target="_blank">
+        <img src="https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+      </a>
+    </td>
+    <td align="center" width="180">
+      <img src="static/Dip.png" alt="Benedict" width="120"/><br/>
+      <strong>Benedict Borillo</strong><br/>
+      API integration / Developer<br/>
+      <a href="https://github.com/SlimeDip" target="_blank">
+        <img src="https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+      </a>
+    </td>
+    <td align="center" width="180">
+      <img src="static/Ron.PNG" alt="Ron" width="120"/><br/>
+      <strong>Ron Emmanuel Guial</strong><br/>
+      UI/UX / Developer<br/>
+      <a href="https://github.com/Maca-roni" target="_blank">
+        <img src="https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+
+✨ Salamat sa aming prof, <strong>Ma'am Fatima Marie Agdon,</strong> ✨  
+sa Diyos, at sa lahat ng sumuporta sa AOOP final project na ito. 💛
+
+<br>
+
+<a href="https://github.com/marieemoiselle" target="_blank">
+  <img src="https://img.shields.io/badge/Maam_Fatima's_GitHub-ff69b4?style=for-the-badge&logo=github&logoColor=white&labelColor=8b008b" alt="Maam Fatima's GitHub"/>
+</a>
+
+<br><br>
+
+🖤 Support our professor by checking out her GitHub! 🖤  
+
+</div>
+
+</div>

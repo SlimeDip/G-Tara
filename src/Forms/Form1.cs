@@ -187,7 +187,7 @@ namespace G_Tara
             participantsForm.ShowDialog(this);
         }
 
-        private async void btnAutoEmail_Click(object sender, EventArgs e) // Modified
+        private async void btnAutoEmail_Click(object sender, EventArgs e)
         {
             var gala = GetSelectedGala();
             if (gala == null)
@@ -196,16 +196,17 @@ namespace G_Tara
                 return;
             }
 
-            using (var confirmForm = new AutoEmailConfirmationForm(gala))
+            var hostEmail = _currentHost?.Email ?? string.Empty;
+            using (var confirmForm = new AutoEmailConfirmationForm(gala, hostEmail))
             {
                 if (confirmForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    await SendPlanEmailToParticipants(gala); //Modified: Waits to complete the process before proceeding
+                    await SendPlanEmailToParticipants(gala);
                 }
             }
         }
 
-        private async Task SendPlanEmailToParticipants(Gala gala)//Modified
+        private async Task SendPlanEmailToParticipants(Gala gala)
         {
             var gmailParticipants = gala.Participants.Where(p => !string.IsNullOrWhiteSpace(p.Email) && p.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)).ToList();
             if (!gmailParticipants.Any())
@@ -235,19 +236,13 @@ namespace G_Tara
                 EnableSsl = true
             };
             
-            var weather = await _weatherService.GetWeatherAsync( //Get weather data
+            var weather = await _weatherService.GetWeatherAsync(
                 gala.Latitude,
                 gala.Longitude,
                 gala.ScheduledDate
              );
 
-            var tips = weather != null //Gives tips depending on the Weather conditions
-                ? _weatherService.GetWeatherTips(weather)
-                : new List<string> { "Weather data unavailable. Please check conditions manually." };
-
-            var extraTips = BuildAdditionalTips(gala, weather);
-            var allTips = tips
-                .Concat(extraTips)
+            var allTips = _weatherService.GetEmailTips(gala, weather)
                 .Where(t => !string.IsNullOrWhiteSpace(t))
                 .Distinct()
                 .ToList();
@@ -303,51 +298,5 @@ namespace G_Tara
             MessageBox.Show("Plan details sent to all participants' Gmail addresses.");
         }
 
-        private List<string> BuildAdditionalTips(Gala gala, WeatherData? weather)
-        {
-            var tips = new List<string>();
-
-            if (!string.IsNullOrWhiteSpace(gala.Location))
-            {
-                tips.Add($"Confirm the meeting point around {gala.Location}.");
-            }
-
-            if (gala.LocationItems != null && gala.LocationItems.Count > 0)
-            {
-                var suggested = gala.LocationItems
-                    .Select(l => l.Name)
-                    .Where(n => !string.IsNullOrWhiteSpace(n))
-                    .Distinct()
-                    .Take(3)
-                    .ToList();
-
-                if (suggested.Count > 0)
-                {
-                    tips.Add($"Suggested nearby spots: {string.Join(", ", suggested)}.");
-                }
-            }
-
-            if (gala.Participants != null && gala.Participants.Count >= 8)
-            {
-                tips.Add("Consider coordinating transport or carpooling for a smoother arrival.");
-            }
-
-            if (gala.Participants == null || gala.Participants.Count == 0)
-            {
-                tips.Add("Invite participants so everyone receives the latest plan.");
-            }
-
-            if (weather != null && weather.Description.Contains("rain", StringComparison.OrdinalIgnoreCase))
-            {
-                tips.Add("Plan a covered meet-up spot in case of rain.");
-            }
-
-            if (weather != null && weather.Description.Contains("clear", StringComparison.OrdinalIgnoreCase))
-            {
-                tips.Add("If outdoors, bring sun protection and water.");
-            }
-
-            return tips;
-        }
         }
     }
