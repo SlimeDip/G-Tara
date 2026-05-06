@@ -423,7 +423,7 @@ namespace G_Tara
             var selectedId = (cmbHost.SelectedItem as Participant)?.Id;
 
             cmbHost.DataSource = null;
-            cmbHost.DisplayMember = "Name";
+            cmbHost.DisplayMember = "DisplayName";
             cmbHost.ValueMember = "Id";
             cmbHost.DataSource = new List<Participant>(_availableParticipants);
 
@@ -489,7 +489,7 @@ namespace G_Tara
                 bool isSelected = _selectedParticipants.Any(sp => sp.Id == p.Id);
                 chkParticipants.Items.Add(p, isSelected);
             }
-            chkParticipants.DisplayMember = "Name";
+            chkParticipants.DisplayMember = "DisplayName";
         }
 
         private void OnParticipantToggled(object? sender, ItemCheckEventArgs e)

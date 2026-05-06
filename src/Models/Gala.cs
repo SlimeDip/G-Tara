@@ -8,6 +8,16 @@ namespace G_Tara.Models
         public List<DateTime> AvailableDates { get; set; } = new();
         public DateTime AvailableStartDate { get; set; }
         public DateTime AvailableEndDate { get; set; }
+        public virtual string DisplayName => Name;
+        public virtual string GetEmailGreeting()
+        {
+            return string.IsNullOrWhiteSpace(Name) ? "Hello!" : $"Hello, {Name}!";
+        }
+
+        public virtual string GetEmailSignature()
+        {
+            return string.IsNullOrWhiteSpace(Name) ? "Organizer" : $"Organizer: {Name}";
+        }
 
         public bool IsAvailableOn(DateTime date)
         {
@@ -86,6 +96,13 @@ namespace G_Tara.Models
 
     public class Participant : Person
     {
+        public override string DisplayName => string.IsNullOrWhiteSpace(Name) ? "Participant" : $"{Name} (Participant)";
+
+        public override string GetEmailGreeting()
+        {
+            return string.IsNullOrWhiteSpace(Name) ? "Tara na!" : $"Tara na, {Name}!";
+        }
+
         public string AvailableDatesDisplay
         {
             get
@@ -115,6 +132,13 @@ namespace G_Tara.Models
 
     public class Host : Person
     {
+        public override string DisplayName => string.IsNullOrWhiteSpace(Name) ? "Host" : $"{Name} (Host)";
+
+        public override string GetEmailSignature()
+        {
+            return string.IsNullOrWhiteSpace(Name) ? "Organizer" : $"Organizer: {Name}";
+        }
+
         public List<string> ManagedGalaIds { get; set; } = new();
     }
 }

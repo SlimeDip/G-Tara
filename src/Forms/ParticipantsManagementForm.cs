@@ -78,7 +78,7 @@ namespace G_Tara
                 MultiSelect = false
             };
 
-            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Name", Width = 150 });
+            dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "DisplayName", HeaderText = "Name", Width = 150 });
             dgvParticipants.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Email", HeaderText = "Email", Width = 200 });
             dgvParticipants.Columns.Add(new DataGridViewButtonColumn
             {

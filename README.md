@@ -105,14 +105,32 @@ public class Host : Person
 ```
 
 ### Polymorphism
-- The app treats different people types through the shared `Person` base type and runs the same logic against them.
+- The app uses a base `Person` type while subclasses change email phrasing through overrides.
 
 ```csharp
-public List<Person> GetAvailableAttendees()
+public abstract class Person
 {
-	return GetAllAttendees()
-		.Where(p => p.IsAvailableOn(ScheduledDate))
-		.ToList();
+	public string Name { get; set; } = string.Empty;
+	public virtual string GetEmailGreeting()
+	{
+		return string.IsNullOrWhiteSpace(Name) ? "Hello!" : $"Hello, {Name}!";
+	}
+}
+
+public class Participant : Person
+{
+	public override string GetEmailGreeting()
+	{
+		return string.IsNullOrWhiteSpace(Name) ? "Tara na!" : $"Tara na, {Name}!";
+	}
+}
+
+public class Host : Person
+{
+	public override string GetEmailGreeting()
+	{
+		return string.IsNullOrWhiteSpace(Name) ? "Hello!" : $"Hello, {Name}!";
+	}
 }
 ```
 

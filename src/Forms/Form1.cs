@@ -218,6 +218,8 @@ namespace G_Tara
                 ? gala.HostName
                 : _currentHost?.Name ?? "Host";
             var hostEmail = _currentHost?.Email ?? string.Empty;
+            var hostIdentity = _currentHost ?? new Host { Name = hostName, Email = hostEmail };
+            var hostSignature = hostIdentity.GetEmailSignature();
 
             string? smtpUser = Environment.GetEnvironmentVariable("GMAIL_USER");
             string? smtpPass = Environment.GetEnvironmentVariable("GMAIL_PASS");
@@ -269,7 +271,7 @@ namespace G_Tara
                     var mail = new System.Net.Mail.MailMessage(smtpUser, participant.Email)
                     {                        
                         Subject = $"Gala Plan: {gala.Name}",
-                        Body = $"Tara na, {participant.Name}!\n" +
+                        Body = $"{participant.GetEmailGreeting()}\n" +
                         $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n" +
                         $"Here are the Gala Details:\n\n" +
                         $"GALA DETAILS\n" +
@@ -278,7 +280,7 @@ namespace G_Tara
                         $"Location: {gala.Location}\n" +
                         $"Plan: {gala.Plan}\n\n" +
                         $"HOST\n" +
-                        $"Organizer: {hostName}\n" +
+                        $"{hostSignature}\n" +
                         (string.IsNullOrWhiteSpace(hostEmail) ? string.Empty : $"Contact: {hostEmail}\n") +
                         $"\n" +
                         $"WEATHER\n" +
