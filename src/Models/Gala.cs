@@ -86,8 +86,6 @@ namespace G_Tara.Models
 
     public class Participant : Person
     {
-        // Yooo pls magisip kayo ng something dito
-
         public string AvailableDatesDisplay
         {
             get
@@ -118,6 +116,5 @@ namespace G_Tara.Models
     public class Host : Person
     {
         public List<string> ManagedGalaIds { get; set; } = new();
-        // Wala pa to kwenta as of now
     }
 }

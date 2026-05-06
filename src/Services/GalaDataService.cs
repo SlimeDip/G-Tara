@@ -8,7 +8,7 @@ namespace G_Tara.Services
         private readonly string _dataPath;
         private readonly string _dataFile;
 
-        public bool HasDateConflict(Gala newGala) //Added: Checks if there are conflict before saving a new Gala
+        public bool HasDateConflict(Gala newGala)
         {
             var galas = LoadGalas();
 
@@ -20,7 +20,7 @@ namespace G_Tara.Services
             );
         }
 
-        public List<Gala> GetDateConflicts(Gala newGala) //Lists the conflicting Schedules
+        public List<Gala> GetDateConflicts(Gala newGala)
         {
             var galas = LoadGalas();
 
@@ -70,7 +70,7 @@ namespace G_Tara.Services
             File.WriteAllText(_dataFile, json);
         }
 
-        public List<Gala> SaveGala(Gala gala) // Modified to return schedule overlap warnings
+        public List<Gala> SaveGala(Gala gala)
         {
             var galas = LoadGalas();
 
@@ -81,7 +81,7 @@ namespace G_Tara.Services
                 RangesOverlap(newStart, newEnd, GetGalaDateRange(g))
             );
 
-            if (conflictingGala != null) //Added: Throws a specific exception if a conflict is detected
+            if (conflictingGala != null)
             {
                 throw new InvalidOperationException(
                     $"Cannot save gala scheduled for {gala.ScheduledDate:yyyy-MM-dd}. " +
