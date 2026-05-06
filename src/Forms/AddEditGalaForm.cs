@@ -7,9 +7,7 @@ namespace G_Tara
     public partial class AddEditGalaForm : Form
     {
         private Gala _gala;
-        private Host? _currentHost;
         private readonly GalaDataService _dataService;
-        private readonly MemberService _memberService;
         private readonly WeatherService _weatherService;
         private readonly LocationService _locationService;
         private readonly ParticipantsDataService _participantsDataService;
@@ -30,7 +28,6 @@ namespace G_Tara
             _gala = gala ?? new Gala();
             _dataService = dataService;
             _participantsDataService = participantsDataService ?? new ParticipantsDataService();
-            _memberService = new MemberService();
             _weatherService = new WeatherService();
             _locationService = new LocationService();
             _selectedLocations = new List<LocationItem>(_gala.LocationItems);

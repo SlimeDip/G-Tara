@@ -6,7 +6,6 @@ namespace G_Tara
     public partial class ParticipantsManagementForm : Form
     {
         private readonly ParticipantsDataService _dataService;
-        private readonly Host? _currentHost;
         private List<Participant> _participants;
         private DataGridView dgvParticipants;
         private TextBox txtSearch;
@@ -16,10 +15,9 @@ namespace G_Tara
         private Button btnRemove;
         private Button btnClose;
 
-        public ParticipantsManagementForm(ParticipantsDataService dataService, Host? currentHost)
+        public ParticipantsManagementForm(ParticipantsDataService dataService)
         {
             _dataService = dataService;
-            _currentHost = currentHost;
             _participants = new List<Participant>();
             InitializeComponent();
         }

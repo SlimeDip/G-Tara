@@ -9,12 +9,8 @@ namespace G_Tara
         private readonly ParticipantsDataService _participantsDataService;
         private readonly WeatherService _weatherService;
         private Host? _currentHost;
-        private List<Participant> _participants;
         private List<Gala> _galas;
         private bool _dateSortAscending = true;
-
-        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public List<Participant> Participants { get; set; } = new();
 
         public Form1()
         {
@@ -23,7 +19,6 @@ namespace G_Tara
             _participantsDataService = new ParticipantsDataService();
             _weatherService = new WeatherService();
             _galas = new List<Gala>();
-            _participants = new List<Participant>();
         }
 
         public Form1(Host? host) : this()
@@ -188,7 +183,7 @@ namespace G_Tara
 
         private void OnManageParticipantsClick(object sender, EventArgs e)
         {
-            using var participantsForm = new ParticipantsManagementForm(_participantsDataService, _currentHost);
+            using var participantsForm = new ParticipantsManagementForm(_participantsDataService);
             participantsForm.ShowDialog(this);
         }
 
