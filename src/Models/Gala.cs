@@ -96,7 +96,7 @@ namespace G_Tara.Models
 
     public class Participant : Person
     {
-        public override string DisplayName => string.IsNullOrWhiteSpace(Name) ? "Participant" : $"{Name} (Participant)";
+        public override string DisplayName => string.IsNullOrWhiteSpace(Name) ? "Participant" : Name;
 
         public override string GetEmailGreeting()
         {

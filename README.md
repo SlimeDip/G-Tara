@@ -21,11 +21,12 @@ In G-Tara, users organize a gala from start to finish. They pick dates, location
 ![UML_Diagram](static/UML_Diagram.png "UML_Diagram")
 
 ## Features and Functionalities of the System
-- Create, edit, and delete galas with date ranges and plans.
+- Create, edit, and delete galas.
 - Manage participants and their availability.
 - Search locations and pick coordinates via an embedded map.
 - Fetch and display weather data for the scheduled date.
 - Send plan emails to Gmail participants.
+- Gather nearby hangout places like cafe, hotel, and restaurants.
 
 ## Explanation of How the Program Works
 - The main window lists galas and lets the user add, edit, or delete them.

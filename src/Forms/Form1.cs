@@ -1,5 +1,7 @@
 using G_Tara.Models;
 using G_Tara.Services;
+using System.Globalization;
+using System.Text;
 
 namespace G_Tara
 {
@@ -196,7 +198,7 @@ namespace G_Tara
                 return;
             }
 
-            var hostEmail = _currentHost?.Email ?? string.Empty;
+            var hostEmail = ResolveHostEmail(gala);
             using (var confirmForm = new AutoEmailConfirmationForm(gala, hostEmail))
             {
                 if (confirmForm.ShowDialog(this) == DialogResult.OK)
@@ -218,7 +220,7 @@ namespace G_Tara
             var hostName = !string.IsNullOrWhiteSpace(gala.HostName)
                 ? gala.HostName
                 : _currentHost?.Name ?? "Host";
-            var hostEmail = _currentHost?.Email ?? string.Empty;
+            var hostEmail = ResolveHostEmail(gala);
             var hostIdentity = _currentHost ?? new Host { Name = hostName, Email = hostEmail };
             var hostSignature = hostIdentity.GetEmailSignature();
 
@@ -258,6 +260,11 @@ namespace G_Tara
                 ? $"{weather.Description}, {weather.Temperature}°C, Humidity {weather.Humidity}%, Wind {weather.WindSpeed} km/h"
                 : "Weather data unavailable.";
 
+            var locationSection = BuildLocationSection(gala);
+            var locationBlock = string.IsNullOrWhiteSpace(locationSection)
+                ? string.Empty
+                : $"{locationSection}\n";
+
 
             foreach (var participant in gmailParticipants)
             {
@@ -274,7 +281,8 @@ namespace G_Tara
                         $"Date: {gala.ScheduledDate:yyyy-MM-dd}\n" +
                         $"Location: {gala.Location}\n" +
                         $"Plan: {gala.Plan}\n\n" +
-                        $"HOST\n" +
+                        locationBlock +
+                        $"\nHOST\n" +
                         $"{hostSignature}\n" +
                         (string.IsNullOrWhiteSpace(hostEmail) ? string.Empty : $"Contact: {hostEmail}\n") +
                         $"\n" +
@@ -296,6 +304,94 @@ namespace G_Tara
             }
 
             MessageBox.Show("Plan details sent to all participants' Gmail addresses.");
+        }
+
+        private string ResolveHostEmail(Gala gala)
+        {
+            if (!string.IsNullOrWhiteSpace(_currentHost?.Email))
+            {
+                return _currentHost.Email;
+            }
+
+            if (!string.IsNullOrWhiteSpace(gala.HostName))
+            {
+                var selectedHost = gala.Participants.FirstOrDefault(p =>
+                    !string.IsNullOrWhiteSpace(p.Email) &&
+                    string.Equals(p.Name, gala.HostName, StringComparison.OrdinalIgnoreCase));
+
+                if (selectedHost != null)
+                {
+                    return selectedHost.Email;
+                }
+
+                var allParticipants = _participantsDataService.LoadParticipants();
+                var savedHost = allParticipants.FirstOrDefault(p =>
+                    !string.IsNullOrWhiteSpace(p.Email) &&
+                    string.Equals(p.Name, gala.HostName, StringComparison.OrdinalIgnoreCase));
+
+                if (savedHost != null)
+                {
+                    return savedHost.Email;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string BuildLocationSection(Gala gala)
+        {
+            if (gala.LocationItems == null || gala.LocationItems.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var lines = new StringBuilder();
+            lines.AppendLine("SELECTED LOCATIONS");
+
+            foreach (var item in gala.LocationItems)
+            {
+                var name = string.IsNullOrWhiteSpace(item.Name) ? "Location" : item.Name;
+                var category = string.IsNullOrWhiteSpace(item.Category) ? string.Empty : $" ({item.Category})";
+                lines.AppendLine($"- {name}{category}");
+
+                var mapLink = BuildGoogleMapsLink(item);
+                if (!string.IsNullOrWhiteSpace(mapLink))
+                {
+                    lines.AppendLine($"  Map: {mapLink}");
+                }
+            }
+
+            return lines.ToString().TrimEnd();
+        }
+
+        private static string BuildGoogleMapsLink(LocationItem item)
+        {
+            var hasCoordinates = item.Latitude != 0 || item.Longitude != 0;
+            if (hasCoordinates)
+            {
+                var lat = item.Latitude.ToString(CultureInfo.InvariantCulture);
+                var lon = item.Longitude.ToString(CultureInfo.InvariantCulture);
+                return $"https://www.google.com/maps/search/?api=1&query={lat},{lon}";
+            }
+
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(item.Name))
+            {
+                parts.Add(item.Name);
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.Address))
+            {
+                parts.Add(item.Address);
+            }
+
+            if (parts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var query = Uri.EscapeDataString(string.Join(", ", parts));
+            return $"https://www.google.com/maps/search/?api=1&query={query}";
         }
 
         }
