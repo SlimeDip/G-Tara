@@ -88,6 +88,7 @@ namespace G_Tara.Models
     {
         // Yooo pls magisip kayo ng something dito
 
+        public string ImagePath { get; set; } = string.Empty;
         public string AvailableDatesDisplay
         {
             get

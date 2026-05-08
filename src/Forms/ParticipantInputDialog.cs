@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -6,6 +7,8 @@ namespace G_Tara
 {
     public partial class ParticipantInputDialog : Form
     {
+        private PictureBox picProfile;
+        private Button btnUploadPhoto;
         private Label lblName;
         private TextBox txtParticipantName;
         private Label lblEmail;
@@ -17,128 +20,168 @@ namespace G_Tara
         private Button btnOK;
         private Button btnCancel;
         private List<DateTime> _selectedDates = new();
+        private string _selectedImagePath = string.Empty;
+        public string ParticipantImagePath => _selectedImagePath;
 
         public ParticipantInputDialog()
         {
             InitializeComponent();
             WireUiEvents();
+            ApplyGaraTheme();
         }
 
         private void InitializeComponent()
         {
-            this.lblName = new System.Windows.Forms.Label();
-            this.txtParticipantName = new System.Windows.Forms.TextBox();
-            this.lblEmail = new System.Windows.Forms.Label();
-            this.txtParticipantEmail = new System.Windows.Forms.TextBox();
-            this.lblAvailableDates = new System.Windows.Forms.Label();
-            this.txtAvailableDates = new System.Windows.Forms.TextBox();
-            this.btnPickDates = new System.Windows.Forms.Button();
-            this.btnClearDates = new System.Windows.Forms.Button();
-            this.btnOK = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-
+            lblName = new Label();
+            txtParticipantName = new TextBox();
+            lblEmail = new Label();
+            txtParticipantEmail = new TextBox();
+            lblAvailableDates = new Label();
+            txtAvailableDates = new TextBox();
+            btnPickDates = new Button();
+            btnClearDates = new Button();
+            picProfile = new PictureBox();
+            btnUploadPhoto = new Button();
+            btnOK = new Button();
+            btnCancel = new Button();
+            ((ISupportInitialize)picProfile).BeginInit();
+            SuspendLayout();
+            // 
             // lblName
-            this.lblName.AutoSize = true;
-            this.lblName.Location = new System.Drawing.Point(12, 15);
-            this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(35, 13);
-            this.lblName.TabIndex = 0;
-            this.lblName.Text = "Name:";
-
+            // 
+            lblName.AutoSize = true;
+            lblName.Location = new Point(30, 40);
+            lblName.Name = "lblName";
+            lblName.Size = new Size(49, 19);
+            lblName.TabIndex = 10;
+            lblName.Text = "Name:";
+            // 
             // txtParticipantName
-            this.txtParticipantName.Location = new System.Drawing.Point(100, 12);
-            this.txtParticipantName.Name = "txtParticipantName";
-            this.txtParticipantName.Size = new System.Drawing.Size(250, 20);
-            this.txtParticipantName.TabIndex = 1;
-
+            // 
+            txtParticipantName.BackColor = Color.FromArgb(255, 248, 248);
+            txtParticipantName.Location = new Point(160, 38);
+            txtParticipantName.Name = "txtParticipantName";
+            txtParticipantName.Size = new Size(250, 25);
+            txtParticipantName.TabIndex = 9;
+            // 
             // lblEmail
-            this.lblEmail.AutoSize = true;
-            this.lblEmail.Location = new System.Drawing.Point(12, 45);
-            this.lblEmail.Name = "lblEmail";
-            this.lblEmail.Size = new System.Drawing.Size(35, 13);
-            this.lblEmail.TabIndex = 2;
-            this.lblEmail.Text = "Email:";
-
+            // 
+            lblEmail.AutoSize = true;
+            lblEmail.Location = new Point(30, 90);
+            lblEmail.Name = "lblEmail";
+            lblEmail.Size = new Size(99, 19);
+            lblEmail.TabIndex = 8;
+            lblEmail.Text = "Email Address:";
+            // 
             // txtParticipantEmail
-            this.txtParticipantEmail.Location = new System.Drawing.Point(100, 42);
-            this.txtParticipantEmail.Name = "txtParticipantEmail";
-            this.txtParticipantEmail.Size = new System.Drawing.Size(250, 20);
-            this.txtParticipantEmail.TabIndex = 3;
-
+            // 
+            txtParticipantEmail.BackColor = Color.FromArgb(255, 248, 248);
+            txtParticipantEmail.Location = new Point(160, 88);
+            txtParticipantEmail.Name = "txtParticipantEmail";
+            txtParticipantEmail.Size = new Size(250, 25);
+            txtParticipantEmail.TabIndex = 7;
+            // 
             // lblAvailableDates
-            this.lblAvailableDates.AutoSize = true;
-            this.lblAvailableDates.Location = new System.Drawing.Point(12, 75);
-            this.lblAvailableDates.Name = "lblAvailableDates";
-            this.lblAvailableDates.Size = new System.Drawing.Size(81, 13);
-            this.lblAvailableDates.TabIndex = 4;
-            this.lblAvailableDates.Text = "Available Dates:";
-
+            // 
+            lblAvailableDates.AutoSize = true;
+            lblAvailableDates.Location = new Point(30, 140);
+            lblAvailableDates.Name = "lblAvailableDates";
+            lblAvailableDates.Size = new Size(82, 19);
+            lblAvailableDates.TabIndex = 6;
+            lblAvailableDates.Text = "Availability:";
+            // 
             // txtAvailableDates
-            this.txtAvailableDates.Location = new System.Drawing.Point(100, 72);
-            this.txtAvailableDates.Multiline = true;
-            this.txtAvailableDates.Name = "txtAvailableDates";
-            this.txtAvailableDates.ReadOnly = true;
-            this.txtAvailableDates.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtAvailableDates.Size = new System.Drawing.Size(250, 60);
-            this.txtAvailableDates.TabIndex = 5;
-
+            // 
+            txtAvailableDates.BackColor = Color.FromArgb(255, 248, 248);
+            txtAvailableDates.Location = new Point(160, 138);
+            txtAvailableDates.Multiline = true;
+            txtAvailableDates.Name = "txtAvailableDates";
+            txtAvailableDates.ReadOnly = true;
+            txtAvailableDates.Size = new Size(250, 70);
+            txtAvailableDates.TabIndex = 5;
+            // 
             // btnPickDates
-            this.btnPickDates.Location = new System.Drawing.Point(100, 138);
-            this.btnPickDates.Name = "btnPickDates";
-            this.btnPickDates.Size = new System.Drawing.Size(120, 23);
-            this.btnPickDates.TabIndex = 6;
-            this.btnPickDates.Text = "Pick Dates";
-            this.btnPickDates.UseVisualStyleBackColor = true;
-
+            // 
+            btnPickDates.Location = new Point(160, 220);
+            btnPickDates.Name = "btnPickDates";
+            btnPickDates.Size = new Size(120, 35);
+            btnPickDates.TabIndex = 4;
+            btnPickDates.Text = "Select Dates";
+            // 
             // btnClearDates
-            this.btnClearDates.Location = new System.Drawing.Point(230, 138);
-            this.btnClearDates.Name = "btnClearDates";
-            this.btnClearDates.Size = new System.Drawing.Size(120, 23);
-            this.btnClearDates.TabIndex = 7;
-            this.btnClearDates.Text = "Clear";
-            this.btnClearDates.UseVisualStyleBackColor = true;
-
+            // 
+            btnClearDates.Location = new Point(290, 220);
+            btnClearDates.Name = "btnClearDates";
+            btnClearDates.Size = new Size(120, 35);
+            btnClearDates.TabIndex = 3;
+            btnClearDates.Text = "Clear All";
+            // 
+            // picProfile
+            // 
+            picProfile.BackColor = Color.FromArgb(255, 248, 248);
+            picProfile.BorderStyle = BorderStyle.FixedSingle;
+            picProfile.Location = new Point(460, 40);
+            picProfile.Name = "picProfile";
+            picProfile.Size = new Size(200, 200);
+            picProfile.SizeMode = PictureBoxSizeMode.Zoom;
+            picProfile.TabIndex = 1;
+            picProfile.TabStop = false;
+            // 
+            // btnUploadPhoto
+            // 
+            btnUploadPhoto.Location = new Point(460, 250);
+            btnUploadPhoto.Name = "btnUploadPhoto";
+            btnUploadPhoto.Size = new Size(200, 40);
+            btnUploadPhoto.TabIndex = 2;
+            btnUploadPhoto.Text = "📷 Upload Photo";
+            btnUploadPhoto.Click += OnUploadPhotoClick;
+            // 
             // btnOK
-            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(194, 175);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 8;
-            this.btnOK.Text = "OK";
-            this.btnOK.UseVisualStyleBackColor = true;
-
+            // 
+            btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnOK.Location = new Point(462, 356);
+            btnOK.Name = "btnOK";
+            btnOK.Size = new Size(110, 34);
+            btnOK.TabIndex = 0;
+            btnOK.Text = "Confirm";
+            // 
             // btnCancel
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(275, 175);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 9;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-
+            // 
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.Location = new Point(584, 356);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(110, 34);
+            btnCancel.TabIndex = 1;
+            btnCancel.Text = "Cancel";
+            // 
             // ParticipantInputDialog
-            this.AcceptButton = this.btnOK;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(362, 215);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnOK);
-            this.Controls.Add(this.btnClearDates);
-            this.Controls.Add(this.btnPickDates);
-            this.Controls.Add(this.txtAvailableDates);
-            this.Controls.Add(this.lblAvailableDates);
-            this.Controls.Add(this.txtParticipantEmail);
-            this.Controls.Add(this.lblEmail);
-            this.Controls.Add(this.txtParticipantName);
-            this.Controls.Add(this.lblName);
-            this.Name = "ParticipantInputDialog";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Add Participant";
-            this.Load += new System.EventHandler(this.ParticipantInputDialog_Load);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            // 
+            AcceptButton = btnOK;
+            BackColor = Color.FromArgb(242, 215, 217);
+            CancelButton = btnCancel;
+            ClientSize = new Size(704, 411);
+            Controls.Add(btnCancel);
+            Controls.Add(btnOK);
+            Controls.Add(picProfile);
+            Controls.Add(btnUploadPhoto);
+            Controls.Add(btnClearDates);
+            Controls.Add(btnPickDates);
+            Controls.Add(txtAvailableDates);
+            Controls.Add(lblAvailableDates);
+            Controls.Add(txtParticipantEmail);
+            Controls.Add(lblEmail);
+            Controls.Add(txtParticipantName);
+            Controls.Add(lblName);
+            Font = new Font("Segoe UI Semibold", 10F);
+            ForeColor = Color.FromArgb(100, 60, 65);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            Name = "ParticipantInputDialog";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Add Participant";
+            ((ISupportInitialize)picProfile).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
@@ -239,8 +282,131 @@ namespace G_Tara
                 txtAvailableDates.Text = "Pending";
                 return;
             }
+            txtAvailableDates.Text = string.Join(
+                Environment.NewLine,
+                _selectedDates
+                    .OrderBy(d => d)
+                    .Select(d => d.ToString("ddd, MMM dd, yyyy")));
+        }
+        private void ApplyGaraTheme()
+        {
+            // G-Tara Signature Button Palette
+            Color btnBack = Color.FromArgb(248, 230, 231);
+            Color btnBorder = Color.FromArgb(210, 170, 175);
+            Color btnHover = Color.FromArgb(235, 190, 195);
+            Color btnDown = Color.FromArgb(200, 150, 155);
 
-            txtAvailableDates.Text = "Dates Selected";
+            // Apply the rounded style and animation to all buttons
+            ApplyRoundedButtonStyle(btnPickDates, btnBack, btnBorder, btnHover, btnDown, null);
+            ApplyRoundedButtonStyle(btnClearDates, btnBack, btnBorder, btnHover, btnDown, null);
+            ApplyRoundedButtonStyle(btnOK, btnBack, btnBorder, btnHover, btnDown, null);
+            ApplyRoundedButtonStyle(btnCancel, btnBack, btnBorder, btnHover, btnDown, null);
+
+            if (btnUploadPhoto != null)
+            {
+                ApplyRoundedButtonStyle(btnUploadPhoto, btnBack, btnBorder, btnHover, btnDown, null);
+            }
+        }
+
+        private void OnUploadPhotoClick(object sender, EventArgs e)
+        {
+            using OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                _selectedImagePath = ofd.FileName;
+                picProfile.Image = Image.FromFile(_selectedImagePath);
+            }
+        }
+
+        private static void ApplyRoundedButtonStyle(Button btn, Color back, Color border, Color hover, Color down, System.Media.SoundPlayer? hoverSound)
+        {
+            if (btn.Tag is RoundedButtonStyleState) return;
+
+            var state = new RoundedButtonStyleState { Back = back, Border = border, Hover = hover, Down = down };
+            btn.Tag = state;
+
+            // 1. IMPROVED CONTROL SETTINGS
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.FlatAppearance.BorderSize = 0;
+            btn.BackColor = Color.Transparent;
+            // This helps prevent "flicker" and default backgrounds showing through
+            // Replace btn.SetStyle(...) with this:
+            // Use System.Reflection for BindingFlags
+            typeof(Control).GetMethod("SetStyle", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.Invoke(btn, new object[] { ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true });
+
+            // 2. REMOVE THE REGION ASSIGNMENT 
+            // (Manual painting with SmoothingMode.AntiAlias handles the "rounded" look better)
+            btn.Region = null;
+
+            state.AnimationTimer = new System.Windows.Forms.Timer { Interval = 15 };
+            state.AnimationTimer.Tick += (s, e) => {
+                var delta = state.HoverTarget - state.HoverProgress;
+                if (Math.Abs(delta) < 0.01f)
+                {
+                    state.HoverProgress = state.HoverTarget;
+                    state.AnimationTimer.Stop();
+                }
+                else
+                {
+                    state.HoverProgress += delta * 0.22f;
+                }
+                btn.Invalidate();
+            };
+
+            btn.MouseEnter += (s, e) => { state.IsHover = true; state.HoverTarget = 1f; state.AnimationTimer.Start(); };
+            btn.MouseLeave += (s, e) => { state.IsHover = false; state.HoverTarget = 0f; state.AnimationTimer.Start(); };
+            btn.MouseDown += (s, e) => { state.IsDown = true; btn.Invalidate(); };
+            btn.MouseUp += (s, e) => { state.IsDown = false; btn.Invalidate(); };
+
+            btn.Paint += (s, e) => {
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+
+                Rectangle rect = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
+                Color current = state.IsDown ? state.Down : Interpolate(state.Back, state.Hover, state.HoverProgress);
+
+                using (var path = CreateRoundedRectPath(rect, 12))
+                {
+                    // Draw the background of the button
+                    using (var brush = new SolidBrush(current))
+                        e.Graphics.FillPath(brush, path);
+
+                    // Draw the border
+                    using (var pen = new Pen(state.Border, 1.5f))
+                        e.Graphics.DrawPath(pen, path);
+                }
+
+                // Draw the text (This uses the .Text property we just set)
+                TextRenderer.DrawText(e.Graphics, btn.Text, btn.Font, btn.ClientRectangle,
+                    Color.FromArgb(80, 40, 45),
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+            };
+        }
+
+        private static Color Interpolate(Color b, Color t, float p) =>
+            Color.FromArgb((int)(b.R + (t.R - b.R) * p), (int)(b.G + (t.G - b.G) * p), (int)(b.B + (t.B - b.B) * p));
+
+        private static System.Drawing.Drawing2D.GraphicsPath CreateRoundedRectPath(Rectangle r, int rad)
+        {
+            var p = new System.Drawing.Drawing2D.GraphicsPath();
+            int d = rad * 2;
+            p.AddArc(r.X, r.Y, d, d, 180, 90);
+            p.AddArc(r.Right - d, r.Y, d, d, 270, 90);
+            p.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
+            p.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
+            p.CloseFigure();
+            return p;
+        }
+
+        // State class to track independent animation progress for each button
+        public class RoundedButtonStyleState
+        {
+            public Color Back, Border, Hover, Down;
+            public float HoverProgress, HoverTarget;
+            public bool IsHover, IsDown;
+            public System.Windows.Forms.Timer AnimationTimer = new();
         }
     }
 }
