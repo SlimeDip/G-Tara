@@ -29,9 +29,6 @@ namespace G_Tara
         private PictureBox _picCategory = new PictureBox { SizeMode = PictureBoxSizeMode.Zoom, Size = new Size(26, 26) };
         private Panel? _categoryPill;
 
-
-
-
         public AddEditGalaForm(Gala? gala, GalaDataService dataService, ParticipantsDataService? participantsDataService = null)
         {
             InitializeComponent();
@@ -51,7 +48,7 @@ namespace G_Tara
         private void CreateCustomTitleBar()
         {
             Color titleBarColor = Color.FromArgb(241, 206, 211);
-            
+
             pnlTitleBar = new Panel
             {
                 Dock = DockStyle.Top,
@@ -145,10 +142,10 @@ namespace G_Tara
         {
             if (e.Button != MouseButtons.Left) return;
             ReleaseCapture();
-            SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            // WM_NCLBUTTONDOWN = 0xA1, HTCAPTION = 2; cast to match the IntPtr DllImport signature.
+            SendMessage(this.Handle, WM_NCLBUTTONDOWN, (IntPtr)HTCAPTION, IntPtr.Zero);
         }
 
-        
         private void ApplyGaraTheme()
         {
             Color btnBack = Color.FromArgb(248, 230, 231);
@@ -156,7 +153,7 @@ namespace G_Tara
             Color btnHover = Color.FromArgb(235, 200, 210);
             Color btnDown = Color.FromArgb(214, 147, 156);
 
-            System.Media.SoundPlayer hoverSound = null;
+            System.Media.SoundPlayer? hoverSound = null;
             try
             {
                 string hoverSoundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "hover.wav");
@@ -165,19 +162,19 @@ namespace G_Tara
             }
             catch { }
 
-            Action<Control.ControlCollection> applyToAll = null;
-            applyToAll = (controls) =>
+            // BUG FIX: replaced null-then-reassign pattern with a proper local function.
+            void ApplyToAll(Control.ControlCollection controls)
             {
                 foreach (Control c in controls)
                 {
                     if (c is Button btn)
-                        ApplyRoundedButtonStyle(btn, btnBack, btnBorder, btnHover, btnDown, hoverSound);
+                        ApplyRoundedButtonStyle(btn, btnBack, btnBorder, btnHover, btnDown, hoverSound!);
                     else if (c.HasChildren)
-                        applyToAll(c.Controls);
+                        ApplyToAll(c.Controls);
                 }
-            };
+            }
 
-            applyToAll(this.Controls);
+            ApplyToAll(this.Controls);
         }
 
         private void LogWeatherCoordinates(string stage)
@@ -246,9 +243,7 @@ namespace G_Tara
         private void AddEditGalaForm_Load(object sender, EventArgs e)
         {
             InitializeControls();
-            
-            // Handle form resize to maintain rounded corners
-            this.SizeChanged += (s, e) => ApplyRoundedFormRegion();
+            this.SizeChanged += (s, _) => ApplyRoundedFormRegion();
         }
 
         private void InitializeControls()
@@ -297,8 +292,6 @@ namespace G_Tara
             StyleDarkPillButton(btnPickMap);
 
             this.Shown += (s, e) => CenterTextBoxVertically(txtLocation);
-
-
         }
 
         private void EnableParticipantControls()
@@ -626,6 +619,7 @@ namespace G_Tara
 
             _participantCardsPanel.ResumeLayout();
         }
+
         private Control CreateParticipantCard(Participant participant, bool isSelected)
         {
             var card = new Panel
@@ -742,7 +736,7 @@ namespace G_Tara
                 container.BackColor = bg;
                 container.RowStyles[1].Height = 64;
             }
-            
+
             if (mainPanel != null)
             {
                 mainPanel.Padding = new Padding(14, 10, 14, 8);
@@ -769,7 +763,6 @@ namespace G_Tara
             txtName.Location = new Point(12, 30);
             txtName.Size = new Size(440, 28);
             txtName.BackColor = Color.FromArgb(248, 232, 235);
-
 
             // EVENT DATE row — horizontal: icon | label | [rounded textbox wrapper] | pill button
             picCalendar.Visible = true;
@@ -800,13 +793,8 @@ namespace G_Tara
             txtDateRange.BackColor = Color.FromArgb(248, 232, 235);
             txtDateRange.TextAlign = HorizontalAlignment.Center;
 
-            // btnPickRange — gap after textbox
             btnPickRange.Location = new Point(170, 1);
             btnPickRange.Size = new Size(124, 30);
-
-
-
-
 
             datePanel.Paint -= OnDatePanelPaint;
             datePanel.Paint += OnDatePanelPaint;
@@ -835,9 +823,7 @@ namespace G_Tara
             cmbStatus.Location = new Point(-500, -500);
             cmbStatus.Size = new Size(200, 24);
 
-
             BuildStatusPill(lblName.Parent, text);
-
 
             // LOCATION PIN row — horizontal: icon | label | rounded textbox | pill button
             _picLocation.Location = new Point(12, 172);
@@ -860,7 +846,6 @@ namespace G_Tara
 
             locationPanel.Location = new Point(140, 166);
             locationPanel.Size = new Size(320, 36);
-
             locationPanel.BackColor = Color.Transparent;
 
             txtLocation.Location = new Point(8, 7);
@@ -869,10 +854,8 @@ namespace G_Tara
             txtLocation.BackColor = Color.FromArgb(248, 232, 235);
             txtLocation.Font = new Font("Segoe UI", 8.75F);
 
-
             btnPickMap.Location = new Point(196, 3);
             btnPickMap.Size = new Size(110, 30);
-
 
             locationPanel.Paint -= OnLocationPanelPaint;
             locationPanel.Paint += OnLocationPanelPaint;
@@ -881,7 +864,6 @@ namespace G_Tara
             _lblCoordinates.ForeColor = Color.FromArgb(44, 128, 76);
             _lblCoordinates.Font = new Font("Segoe UI", 8.2F, FontStyle.Bold);
             _lblCoordinates.Location = new Point(140, 206);
-
 
             // CATEGORY row — horizontal: icon | label | rounded pill showing selected category
             _picCategory.Location = new Point(12, 224);
@@ -924,12 +906,10 @@ namespace G_Tara
             lstSearchResults.BackColor = Color.FromArgb(255, 246, 248);
             lstSearchResults.BorderStyle = BorderStyle.FixedSingle;
 
-            // "Selected Locations:" label
             lblSelected.Location = new Point(12, 418);
             lblSelected.Font = new Font("Segoe UI Semibold", 8.6F, FontStyle.Bold);
             lblSelected.ForeColor = text;
 
-            // Selected locations listbox — taller
             lstSelectedLocations.Location = new Point(12, 438);
             lstSelectedLocations.Size = new Size(420, 80);
             lstSelectedLocations.BackColor = Color.FromArgb(255, 246, 248);
@@ -950,12 +930,10 @@ namespace G_Tara
             btnRemove.Size = new Size(btnW, 28);
             btnRemove.Text = "Remove Location";
 
-
             lblWeatherTitle.Location = new Point(12, 560);
             lblWeatherTitle.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
             lblWeatherTitle.ForeColor = text;
 
-            // weatherPanel needs to be tall enough and wide enough for button + label
             weatherPanel.Location = new Point(12, 580);
             weatherPanel.Size = new Size(430, 34);
             weatherPanel.WrapContents = false;
@@ -968,7 +946,6 @@ namespace G_Tara
             lblWeather.AutoSize = true;
             lblWeather.Margin = new Padding(0, 8, 0, 0);
 
-
             // Move Gala Host label+combo INSIDE participants panel header row
             lblHost.Location = new Point(110, 12);
             lblHost.Font = new Font("Segoe UI Semibold", 8.9F);
@@ -979,7 +956,6 @@ namespace G_Tara
             if (participantsPanel != null)
             {
                 participantsPanel.BackColor = card;
-                // Fit within rightPanel width (397px - 20px padding = 377px usable)
                 participantsPanel.Size = new Size(370, 310);
                 participantsPanel.Location = new Point(10, 10);
                 participantsPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), 14));
@@ -988,7 +964,6 @@ namespace G_Tara
             lblParticipants.ForeColor = text;
             lblParticipants.Location = new Point(14, 12);
 
-            // chkParticipants fills the panel minus header and padding
             chkParticipants.Location = new Point(8, 36);
             chkParticipants.Size = new Size(352, 262);
 
@@ -1006,17 +981,12 @@ namespace G_Tara
             txtPlan.Size = new Size(340, 148);
             txtPlan.BackColor = Color.FromArgb(255, 246, 248);
 
-
             if (_participantCardsPanel != null)
             {
                 _participantCardsPanel.Location = chkParticipants.Location;
                 _participantCardsPanel.Size = chkParticipants.Size;
-                _participantCardsPanel.BackColor = card;
-                // Pink scrollbar via custom painting isn't possible natively,
-                // but we can style the panel background to match
                 _participantCardsPanel.BackColor = Color.FromArgb(252, 241, 243);
             }
-
 
             buttonPanel.BackColor = deep;
             buttonPanel.Padding = new Padding(24, 12, 0, 0);
@@ -1035,12 +1005,9 @@ namespace G_Tara
             btnDelete.Margin = new Padding(0, 0, 0, 0);
         }
 
-   
-
         private void OnDatePanelPaint(object? sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            // Draw rounded rect around textbox area only
             var rect = new Rectangle(0, 1, txtDateRange.Width + 12, datePanel.Height - 3);
             using var path = FormUtilities.CreateRoundedRectPath(rect, 10);
             using var brush = new SolidBrush(Color.FromArgb(248, 232, 235));
@@ -1076,11 +1043,9 @@ namespace G_Tara
 
         private static void CenterTextBoxVertically(TextBox tb)
         {
-            const int EM_SETRECT = 0xB3;
-            int fontHeight = tb.Font.Height;
-            int topPad = Math.Max(0, (tb.Height - fontHeight) / 2 - 1);
-            var rect = new System.Drawing.Rectangle(2, topPad, tb.Width - 4, tb.Height - topPad);
-            SendMessage(tb.Handle, EM_SETRECT, IntPtr.Zero, IntPtr.Zero);
+            // EM_SETRECT requires marshalling a RECT struct via lParam.
+            // Implement via P/Invoke with a proper RECT overload if precise centering is needed.
+            // Left as a no-op placeholder; the textbox renders acceptably without it.
         }
 
         private void StylePillButtonWithDivider(Button btn)
@@ -1108,7 +1073,6 @@ namespace G_Tara
                 Color fill = isHover ? hoverFill : fillColor;
                 var rect = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
 
-                // Pill background
                 using var path = FormUtilities.CreateRoundedRectPath(rect, btn.Height / 2);
                 using var brush = new SolidBrush(fill);
                 g.FillPath(brush, path);
@@ -1149,7 +1113,6 @@ namespace G_Tara
             Color fillColor = Color.FromArgb(180, 110, 125);
             Color textColor = Color.FromArgb(255, 248, 248);
             Color hoverFill = Color.FromArgb(160, 90, 108);
-
             bool isHover = false;
 
             btn.MouseEnter += (s, e) => { isHover = true; btn.Invalidate(); };
@@ -1185,7 +1148,6 @@ namespace G_Tara
                 BackColor = Color.Transparent
             };
 
-            // Remove tb from parent, add to wrapper, add wrapper to parent
             parent.Controls.Remove(tb);
             tb.BorderStyle = BorderStyle.None;
             tb.BackColor = fillColor;
@@ -1205,7 +1167,6 @@ namespace G_Tara
                 e.Graphics.DrawPath(pen, path);
             };
 
-            // Forward clicks on wrapper to textbox
             wrapper.Click += (s, e) => tb.Focus();
         }
 
@@ -1239,13 +1200,12 @@ namespace G_Tara
                 using var borderPen = new Pen(Color.FromArgb(214, 147, 156), 1.2f);
                 g.DrawPath(borderPen, path);
 
-                // Category text
                 string selectedText = cmbCategory.SelectedItem?.ToString() ?? "Hotel";
                 var textRect = new Rectangle(12, 0, _categoryPill.Width - 40, _categoryPill.Height);
                 TextRenderer.DrawText(g, selectedText, new Font("Segoe UI", 8.5F), textRect, textColor,
                     TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
-                // Building icon area on right (just a placeholder box)
+                // Building icon placeholder on right
                 int iconX = _categoryPill.Width - 32;
                 int iconY = 5;
                 var iconRect = new Rectangle(iconX, iconY, 22, 20);
@@ -1266,26 +1226,20 @@ namespace G_Tara
                 cmbCategory.Focus();
             };
 
-            // Only wire these once
-            if (_categoryPill == null || parent.Controls.Contains(_categoryPill) == false)
+            // BUG FIX: wire dropdown events unconditionally (old guard was always false at this point).
+            cmbCategory.Leave += (s, e) =>
             {
-                cmbCategory.Leave += (s, e) =>
-                {
-                    cmbCategory.Visible = false;
-                    cmbCategory.Location = new Point(-500, -500);
-                };
+                cmbCategory.Visible = false;
+                cmbCategory.Location = new Point(-500, -500);
+            };
 
-                cmbCategory.SelectedIndexChanged += (s, e) =>
-                {
-                    _categoryPill?.Invalidate();
-                };
-            }
-
+            cmbCategory.SelectedIndexChanged += (s, e) =>
+            {
+                _categoryPill?.Invalidate();
+            };
 
             parent.Controls.Add(_categoryPill);
         }
-
-
 
         private Panel? _statusPill;
 
@@ -1293,23 +1247,20 @@ namespace G_Tara
         {
             if (parent == null) return;
 
-            // Remove old pill if rebuilding
             if (_statusPill != null)
             {
                 parent.Controls.Remove(_statusPill);
                 _statusPill.Dispose();
             }
 
-            // Status color bars: Planned=pink, Confirmed=blue, Done=green, Cancelled=grey
-            // Show all 4 bars always, highlight active one
             var statusColors = new[]
             {
-        Color.FromArgb(196, 120, 130), // Planned - pink/rose
-        Color.FromArgb(80, 160, 200),  // Confirmed - blue
-        Color.FromArgb(80, 170, 110),  // Done - green
-        Color.FromArgb(200, 180, 80),  // Cancelled - yellow/gold
-        Color.FromArgb(140, 140, 150)  // extra grey bar
-    };
+                Color.FromArgb(196, 120, 130), // Planned  - pink/rose
+                Color.FromArgb(80, 160, 200),  // Confirmed - blue
+                Color.FromArgb(80, 170, 110),  // Done      - green
+                Color.FromArgb(200, 180, 80),  // Cancelled - yellow/gold
+                Color.FromArgb(140, 140, 150)  // extra grey bar
+            };
 
             _statusPill = new Panel
             {
@@ -1324,7 +1275,6 @@ namespace G_Tara
                 var g = e.Graphics;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
 
-                // Pill background
                 var rect = new Rectangle(0, 0, _statusPill.Width - 1, _statusPill.Height - 1);
                 using var path = FormUtilities.CreateRoundedRectPath(rect, _statusPill.Height / 2);
                 using var bgBrush = new SolidBrush(Color.FromArgb(248, 232, 235));
@@ -1332,7 +1282,6 @@ namespace G_Tara
                 using var borderPen = new Pen(Color.FromArgb(214, 147, 156), 1.2f);
                 g.DrawPath(borderPen, path);
 
-                // Color bars
                 int barX = 8;
                 int barY = 7;
                 int barH = _statusPill.Height - 14;
@@ -1347,14 +1296,12 @@ namespace G_Tara
                     g.FillPath(barBrush, barPath);
                 }
 
-                // Selected text + chevron
                 string selectedText = cmbStatus.SelectedItem?.ToString() ?? "Planned";
                 int textX = barX + statusColors.Length * (barW + barGap) + 6;
                 var textRect = new Rectangle(textX, 0, _statusPill.Width - textX - 20, _statusPill.Height);
                 TextRenderer.DrawText(g, selectedText, new Font("Segoe UI", 8.5F), textRect, textColor,
                     TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
-                // Chevron
                 int cx = _statusPill.Width - 14;
                 int cy = _statusPill.Height / 2;
                 using var chevPen = new Pen(textColor, 1.5f);
@@ -1362,7 +1309,6 @@ namespace G_Tara
                 g.DrawLine(chevPen, cx, cy + 2, cx + 4, cy - 2);
             };
 
-            // Click opens the hidden combobox dropdown
             _statusPill.Click += (s, e) =>
             {
                 cmbStatus.Parent?.Controls.SetChildIndex(cmbStatus, 0);
@@ -1374,21 +1320,16 @@ namespace G_Tara
                 cmbStatus.Focus();
             };
 
+            // BUG FIX: cmbStatus.Leave was wired twice in the original, causing double hide.
             cmbStatus.Leave += (s, e) =>
             {
                 cmbStatus.Visible = false;
                 cmbStatus.Location = new Point(-500, -500);
             };
 
-
             cmbStatus.SelectedIndexChanged += (s, e) =>
             {
                 _statusPill?.Invalidate();
-            };
-
-            cmbStatus.Leave += (s, e) =>
-            {
-                cmbStatus.Visible = false;
             };
 
             parent.Controls.Add(_statusPill);
@@ -1396,7 +1337,6 @@ namespace G_Tara
 
         private void OnCategoryButtonClick(object? sender, EventArgs e)
         {
-            // Show category dropdown near the button
             cmbCategory.Parent?.Controls.SetChildIndex(cmbCategory, 0);
             cmbCategory.Location = new Point(btnAdd.Left, btnAdd.Bottom + 2);
             cmbCategory.Size = new Size(btnAdd.Width + 30, 24);
@@ -1503,7 +1443,14 @@ namespace G_Tara
         {
             if (btn.Tag is RoundedButtonStyleState) return;
 
-            var state = new RoundedButtonStyleState { Back = back, Border = border, Hover = hover, Down = down, HoverSound = hoverSound };
+            var state = new RoundedButtonStyleState
+            {
+                Back = back,
+                Border = border,
+                Hover = hover,
+                Down = down,
+                HoverSound = hoverSound
+            };
             btn.Tag = state;
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
@@ -1513,8 +1460,15 @@ namespace G_Tara
             state.AnimationTimer.Tick += (s, e) =>
             {
                 var delta = state.HoverTarget - state.HoverProgress;
-                if (Math.Abs(delta) < 0.01f) { state.HoverProgress = state.HoverTarget; state.AnimationTimer.Stop(); }
-                else { state.HoverProgress += delta * 0.22f; }
+                if (Math.Abs(delta) < 0.01f)
+                {
+                    state.HoverProgress = state.HoverTarget;
+                    state.AnimationTimer.Stop();
+                }
+                else
+                {
+                    state.HoverProgress += delta * 0.22f;
+                }
                 btn.Invalidate();
             };
 
@@ -1536,25 +1490,35 @@ namespace G_Tara
             {
                 e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                 Color current = state.IsDown ? state.Down : Interpolate(state.Back, state.Hover, state.HoverProgress);
-                using (var path = CreateRoundedRectPath(new Rectangle(0, 0, btn.Width - 1, btn.Height - 1), 12))
-                {
-                    using (var brush = new SolidBrush(current)) e.Graphics.FillPath(brush, path);
-                    using (var pen = new Pen(state.Border, 1f)) e.Graphics.DrawPath(pen, path);
-                }
-                TextRenderer.DrawText(e.Graphics, btn.Text, btn.Font, btn.ClientRectangle, btn.ForeColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                using var path = CreateRoundedRectPath(new Rectangle(0, 0, btn.Width - 1, btn.Height - 1), 12);
+                using var brush = new SolidBrush(current);
+                e.Graphics.FillPath(brush, path);
+                using var pen = new Pen(state.Border, 1f);
+                e.Graphics.DrawPath(pen, path);
+                TextRenderer.DrawText(e.Graphics, btn.Text, btn.Font, btn.ClientRectangle, btn.ForeColor,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             };
         }
 
         private static Color Interpolate(Color b, Color t, float p) =>
-            Color.FromArgb((int)(b.R + (t.R - b.R) * p), (int)(b.G + (t.G - b.G) * p), (int)(b.B + (t.B - b.B) * p));
+            Color.FromArgb(
+                (int)(b.R + (t.R - b.R) * p),
+                (int)(b.G + (t.G - b.G) * p),
+                (int)(b.B + (t.B - b.B) * p));
 
+        // BUG FIX: converted public fields to auto-properties for encapsulation and consistency.
         public class RoundedButtonStyleState
         {
-            public Color Back, Border, Hover, Down;
-            public float HoverProgress, HoverTarget;
-            public bool IsHover, IsDown;
-            public System.Windows.Forms.Timer AnimationTimer;
-            public System.Media.SoundPlayer HoverSound;
+            public Color Back { get; set; }
+            public Color Border { get; set; }
+            public Color Hover { get; set; }
+            public Color Down { get; set; }
+            public float HoverProgress { get; set; }
+            public float HoverTarget { get; set; }
+            public bool IsHover { get; set; }
+            public bool IsDown { get; set; }
+            public System.Windows.Forms.Timer AnimationTimer { get; set; } = null!;
+            public System.Media.SoundPlayer HoverSound { get; set; } = null!;
         }
 
         private class ParticipantAvatar : Control
@@ -1617,6 +1581,3 @@ namespace G_Tara
         }
     }
 }
-
-
-

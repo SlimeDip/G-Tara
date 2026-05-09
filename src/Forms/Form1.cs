@@ -1,6 +1,8 @@
 using G_Tara.Models;
 using G_Tara.Services;
+using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace G_Tara
 {
@@ -21,6 +23,7 @@ namespace G_Tara
         private readonly WeatherService _weatherService;
         private Host? _currentHost;
         private List<Gala> _galas;
+        private List<Participant> _participants;  // BUG FIX: was assigned in constructor but never declared
         private bool _dateSortAscending = true;
 
         public Form1()
@@ -114,13 +117,14 @@ namespace G_Tara
             {
                 return;
             }
-            // Position the logo first[cite: 2]
+
+            // Position the logo first
             if (picMiniLogo != null)
             {
                 picMiniLogo.Location = new Point(12, (titleBar.Height - picMiniLogo.Height) / 2);
             }
 
-            // Position the title text right after the logo[cite: 2]
+            // Position the title text right after the logo
             if (lblTitle != null && picMiniLogo != null)
             {
                 lblTitle.Location = new Point(picMiniLogo.Right + 8, (titleBar.Height - lblTitle.Height) / 2);
@@ -128,12 +132,9 @@ namespace G_Tara
 
             if (btnWindowMinimize != null && btnWindowClose != null)
             {
-                // Center the window buttons using the container padding (FlowLayoutPanel padding + button margin).
-                var top = Math.Max(0, (titleBar.Height - btnWindowClose.Height) / 2);
-
                 if (windowButtonsPanel != null)
                 {
-                    top = Math.Max(0, (titleBar.Height - 32) / 2);
+                    var top = Math.Max(0, (titleBar.Height - 32) / 2);
                     windowButtonsPanel.Padding = new Padding(0, top, 8, 0);
                 }
 
@@ -290,7 +291,6 @@ namespace G_Tara
             public required Color Down { get; init; }
             public bool IsHover { get; set; }
             public bool IsDown { get; set; }
-
             public float HoverProgress { get; set; }
             public float HoverTarget { get; set; }
             public System.Windows.Forms.Timer? AnimationTimer { get; set; }
@@ -323,7 +323,6 @@ namespace G_Tara
             state.AnimationTimer = new System.Windows.Forms.Timer { Interval = 15 };
             state.AnimationTimer.Tick += (_, _) =>
             {
-                // Smoothly approach target.
                 var delta = state.HoverTarget - state.HoverProgress;
                 if (Math.Abs(delta) < 0.01f)
                 {
@@ -344,10 +343,8 @@ namespace G_Tara
                 state.HoverTarget = 1f;
                 state.AnimationTimer?.Start();
 
-                // Play the custom sound
                 try
                 {
-                    // Only play if the sound was successfully loaded
                     if (hoverSound != null && !string.IsNullOrEmpty(hoverSound.SoundLocation))
                     {
                         hoverSound.Play();
@@ -355,7 +352,6 @@ namespace G_Tara
                 }
                 catch
                 {
-                    // Fallback to a subtle system sound if the custom file fails
                     System.Media.SystemSounds.Asterisk.Play();
                 }
 
@@ -421,11 +417,11 @@ namespace G_Tara
                 using var borderPen = new Pen(s.Border, 1);
                 e.Graphics.DrawPath(borderPen, path);
 
-                // Layout Icon and Text
+                // Layout icon and text
                 var image = btn.Image;
                 var text = btn.Text ?? string.Empty;
                 var imageSize = 32;
-                var spacing = 4; // Reduced spacing between icon and text
+                var spacing = 4;
 
                 // Calculate total content height to center it as a block
                 var textSize = TextRenderer.MeasureText(text, btn.Font, new Size(rect.Width - 16, 100), TextFormatFlags.WordBreak);
@@ -464,15 +460,8 @@ namespace G_Tara
             var path = new System.Drawing.Drawing2D.GraphicsPath();
             var d = radius * 2;
 
-            if (d > rect.Width)
-            {
-                d = rect.Width;
-            }
-
-            if (d > rect.Height)
-            {
-                d = rect.Height;
-            }
+            if (d > rect.Width) d = rect.Width;
+            if (d > rect.Height) d = rect.Height;
 
             path.AddArc(rect.X, rect.Y, d, d, 180, 90);
             path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90);
@@ -495,12 +484,11 @@ namespace G_Tara
         {
             try
             {
-                // Assumes you have a file named 'hover.wav' in your Assets folder
-                string soundPath = Path.Combine(AppContext.BaseDirectory, "Assets", "hover.wav");
+                var soundPath = Path.Combine(AppContext.BaseDirectory, "Assets", "hover.wav");
                 if (File.Exists(soundPath))
                 {
                     _hoverSound.SoundLocation = soundPath;
-                    _hoverSound.Load(); // Pre-load into memory for instant playback
+                    _hoverSound.Load();
                 }
             }
             catch (Exception ex)
@@ -533,7 +521,7 @@ namespace G_Tara
                 }
                 catch
                 {
-                    // ignore icon load failures
+                    // Ignore icon load failures.
                 }
             }
         }
@@ -694,6 +682,8 @@ namespace G_Tara
             participantsForm.ShowDialog(this);
         }
 
+        // BUG FIX: wrapped in try/catch so unhandled exceptions from the awaited task
+        // don't silently crash the application on the async void boundary.
         private async void btnAutoEmail_Click(object sender, EventArgs e)
         {
             var gala = GetSelectedGala();
@@ -703,19 +693,26 @@ namespace G_Tara
                 return;
             }
 
-            var hostEmail = ResolveHostEmail(gala);
-            using (var confirmForm = new AutoEmailConfirmationForm(gala, hostEmail))
+            using var confirmForm = new AutoEmailConfirmationForm(gala);
+            if (confirmForm.ShowDialog(this) == DialogResult.OK)
             {
-                if (confirmForm.ShowDialog(this) == DialogResult.OK)
+                try
                 {
                     await SendPlanEmailToParticipants(gala);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An unexpected error occurred while sending emails:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
         private async Task SendPlanEmailToParticipants(Gala gala)
         {
-            var gmailParticipants = gala.Participants.Where(p => !string.IsNullOrWhiteSpace(p.Email) && p.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)).ToList();
+            var gmailParticipants = gala.Participants
+                .Where(p => !string.IsNullOrWhiteSpace(p.Email) && p.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
             if (!gmailParticipants.Any())
             {
                 MessageBox.Show("No participants with Gmail addresses found.");
@@ -729,25 +726,18 @@ namespace G_Tara
             var hostIdentity = _currentHost ?? new Host { Name = hostName, Email = hostEmail };
             var hostSignature = hostIdentity.GetEmailSignature();
 
-            string? smtpUser = Environment.GetEnvironmentVariable("GMAIL_USER");
-            string? smtpPass = Environment.GetEnvironmentVariable("GMAIL_PASS");
+            var smtpUser = Environment.GetEnvironmentVariable("GMAIL_USER");
+            var smtpPass = Environment.GetEnvironmentVariable("GMAIL_PASS");
             if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(smtpPass))
             {
                 MessageBox.Show("GMAIL_USER or GMAIL_PASS environment variables not set.");
                 return;
             }
 
-            var smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587)
-            {
-                Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass),
-                EnableSsl = true
-            };
-
-            var weather = await _weatherService.GetWeatherAsync( //Get weather data
+            var weather = await _weatherService.GetWeatherAsync(
                 gala.Latitude,
                 gala.Longitude,
-                gala.ScheduledDate
-             );
+                gala.ScheduledDate);
 
             var allTips = _weatherService.GetEmailTips(gala, weather)
                 .Where(t => !string.IsNullOrWhiteSpace(t))
@@ -759,7 +749,7 @@ namespace G_Tara
                 allTips.Add("Please check details and reach out to the host if anything changes.");
             }
 
-            string tipSection = string.Join("\n- ", allTips);
+            var tipSection = string.Join("\n- ", allTips);
 
             var weatherSummary = weather != null
                 ? $"{weather.Description}, {weather.Temperature}°C, Humidity {weather.Humidity}%, Wind {weather.WindSpeed} km/h"
@@ -770,6 +760,12 @@ namespace G_Tara
                 ? string.Empty
                 : $"{locationSection}\n";
 
+            // BUG FIX: SmtpClient implements IDisposable; wrap in using to ensure it is released.
+            using var smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587)
+            {
+                Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass),
+                EnableSsl = true
+            };
 
             foreach (var participant in gmailParticipants)
             {
@@ -778,31 +774,32 @@ namespace G_Tara
                     var mail = new System.Net.Mail.MailMessage(smtpUser, participant.Email)
                     {
                         Subject = $"Gala Plan: {gala.Name}",
-                        Body = $"{participant.GetEmailGreeting()}\n" +
-                        $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n" +
-                        $"Here are the Gala Details:\n\n" +
-                        $"GALA DETAILS\n" +
-                        $"Name: {gala.Name}\n" +
-                        $"Date: {gala.ScheduledDate:yyyy-MM-dd}\n" +
-                        $"Location: {gala.Location}\n" +
-                        $"Plan: {gala.Plan}\n\n" +
-                        locationBlock +
-                        $"\nHOST\n" +
-                        $"{hostSignature}\n" +
-                        (string.IsNullOrWhiteSpace(hostEmail) ? string.Empty : $"Contact: {hostEmail}\n") +
-                        $"\n" +
-                        $"WEATHER\n" +
-                        $"Forecast: {weatherSummary}\n\n" +
-                        $"RECOMMENDATIONS\n" +
-                        $"- {tipSection}\n\n" +
-                        $"If you have any questions or updates, please reach out to the host.\n" +
-                        $"\nAno G? Tara!",
+                        Body =
+                            $"{participant.GetEmailGreeting()}\n" +
+                            $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n" +
+                            $"Here are the Gala Details:\n\n" +
+                            $"GALA DETAILS\n" +
+                            $"Name: {gala.Name}\n" +
+                            $"Date: {gala.ScheduledDate:yyyy-MM-dd}\n" +
+                            $"Location: {gala.Location}\n" +
+                            $"Plan: {gala.Plan}\n\n" +
+                            locationBlock +
+                            $"\nHOST\n" +
+                            hostSignature + "\n" +
+                            (string.IsNullOrWhiteSpace(hostEmail) ? string.Empty : $"Contact: {hostEmail}\n") +
+                            $"\nWEATHER\n" +
+                            $"Forecast: {weatherSummary}\n\n" +
+                            $"RECOMMENDATIONS\n" +
+                            $"- {tipSection}\n\n" +
+                            $"If you have any questions or updates, please reach out to the host.\n" +
+                            $"\nAno G? Tara!"
                     };
+
                     smtp.Send(mail);
                 }
                 catch (Exception ex)
                 {
-                    string errorDetails = $"Failed to send email to {participant.Email}:\n{ex.Message}\n\n{ex.StackTrace}";
+                    var errorDetails = $"Failed to send email to {participant.Email}:\n{ex.Message}\n\n{ex.StackTrace}";
                     MessageBox.Show(errorDetails, "SMTP Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Console.WriteLine(errorDetails);
                 }
@@ -880,15 +877,8 @@ namespace G_Tara
             }
 
             var parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(item.Name))
-            {
-                parts.Add(item.Name);
-            }
-
-            if (!string.IsNullOrWhiteSpace(item.Address))
-            {
-                parts.Add(item.Address);
-            }
+            if (!string.IsNullOrWhiteSpace(item.Name)) parts.Add(item.Name);
+            if (!string.IsNullOrWhiteSpace(item.Address)) parts.Add(item.Address);
 
             if (parts.Count == 0)
             {
@@ -899,9 +889,9 @@ namespace G_Tara
             return $"https://www.google.com/maps/search/?api=1&query={query}";
         }
 
+        // Registered by Form1.Designer.cs; implement cell content click logic here if needed.
         private void dgvGalas_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
         }
     }
 }
