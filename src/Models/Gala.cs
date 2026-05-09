@@ -103,6 +103,7 @@ namespace G_Tara.Models
             return string.IsNullOrWhiteSpace(Name) ? "Tara na!" : $"Tara na, {Name}!";
         }
 
+        public string ImagePath { get; set; } = string.Empty;
         public string AvailableDatesDisplay
         {
             get
