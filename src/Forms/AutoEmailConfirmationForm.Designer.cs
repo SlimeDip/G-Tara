@@ -5,6 +5,8 @@ namespace G_Tara
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Label lblParticipants;
         private System.Windows.Forms.TextBox txtParticipants;
+        private System.Windows.Forms.Label lblHostEmail;
+        private System.Windows.Forms.TextBox txtHostEmail;
         private System.Windows.Forms.Label lblPlanDetails;
         private System.Windows.Forms.TextBox txtPlanDetails;
         private System.Windows.Forms.Button btnConfirm;
@@ -30,6 +32,8 @@ namespace G_Tara
 
             this.lblParticipants = new System.Windows.Forms.Label();
             this.txtParticipants = new System.Windows.Forms.TextBox();
+            this.lblHostEmail = new System.Windows.Forms.Label();
+            this.txtHostEmail = new System.Windows.Forms.TextBox();
             this.lblPlanDetails = new System.Windows.Forms.Label();
             this.txtPlanDetails = new System.Windows.Forms.TextBox();
             this.btnConfirm = new System.Windows.Forms.Button();
@@ -60,7 +64,25 @@ namespace G_Tara
             this.txtParticipants.ReadOnly = true;
             this.txtParticipants.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtParticipants.Size = new System.Drawing.Size(360, 80);
-            //
+            this.txtParticipants.TabIndex = 1;
+            // 
+            // lblHostEmail
+            // 
+            this.lblHostEmail.AutoSize = true;
+            this.lblHostEmail.Location = new System.Drawing.Point(12, 115);
+            this.lblHostEmail.Name = "lblHostEmail";
+            this.lblHostEmail.Size = new System.Drawing.Size(73, 15);
+            this.lblHostEmail.TabIndex = 2;
+            this.lblHostEmail.Text = "Host Email:";
+            // 
+            // txtHostEmail
+            // 
+            this.txtHostEmail.Location = new System.Drawing.Point(12, 133);
+            this.txtHostEmail.Name = "txtHostEmail";
+            this.txtHostEmail.ReadOnly = true;
+            this.txtHostEmail.Size = new System.Drawing.Size(360, 23);
+            this.txtHostEmail.TabIndex = 3;
+            // 
             // lblPlanDetails
             //
             this.lblPlanDetails.AutoSize = true;
@@ -103,6 +125,8 @@ namespace G_Tara
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.txtPlanDetails);
             this.Controls.Add(this.lblPlanDetails);
+            this.Controls.Add(this.txtHostEmail);
+            this.Controls.Add(this.lblHostEmail);
             this.Controls.Add(this.txtParticipants);
             this.Controls.Add(this.lblParticipants);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

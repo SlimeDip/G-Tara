@@ -24,7 +24,6 @@ namespace G_Tara
         private Button btnFooterAdd;
         private Button btnFooterClose;
         private readonly ParticipantsDataService _dataService;
-        private readonly Host? _currentHost;
         private List<Participant> _participants;
         private readonly System.Media.SoundPlayer _hoverSound = new System.Media.SoundPlayer();
 
@@ -38,10 +37,9 @@ namespace G_Tara
         private Button btnWindowClose;
         private Label lblWindowTitle;
 
-        public ParticipantsManagementForm(ParticipantsDataService dataService, Host? currentHost)
+        public ParticipantsManagementForm(ParticipantsDataService dataService)
         {
             _dataService = dataService;
-            _currentHost = currentHost;
             _participants = new List<Participant>();
             LoadSounds();
             InitializeComponent();

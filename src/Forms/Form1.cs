@@ -20,12 +20,8 @@ namespace G_Tara
         private readonly ParticipantsDataService _participantsDataService;
         private readonly WeatherService _weatherService;
         private Host? _currentHost;
-        private List<Participant> _participants;
         private List<Gala> _galas;
         private bool _dateSortAscending = true;
-
-        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public List<Participant> Participants { get; set; } = new();
 
         public Form1()
         {
@@ -694,11 +690,11 @@ namespace G_Tara
 
         private void OnManageParticipantsClick(object sender, EventArgs e)
         {
-            using var participantsForm = new ParticipantsManagementForm(_participantsDataService, _currentHost);
+            using var participantsForm = new ParticipantsManagementForm(_participantsDataService);
             participantsForm.ShowDialog(this);
         }
 
-        private async void btnAutoEmail_Click(object sender, EventArgs e) // Modified
+        private async void btnAutoEmail_Click(object sender, EventArgs e)
         {
             var gala = GetSelectedGala();
             if (gala == null)
@@ -707,16 +703,17 @@ namespace G_Tara
                 return;
             }
 
-            using (var confirmForm = new AutoEmailConfirmationForm(gala))
+            var hostEmail = ResolveHostEmail(gala);
+            using (var confirmForm = new AutoEmailConfirmationForm(gala, hostEmail))
             {
                 if (confirmForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    await SendPlanEmailToParticipants(gala); //Modified: Waits to complete the process before proceeding
+                    await SendPlanEmailToParticipants(gala);
                 }
             }
         }
 
-        private async Task SendPlanEmailToParticipants(Gala gala)//Modified
+        private async Task SendPlanEmailToParticipants(Gala gala)
         {
             var gmailParticipants = gala.Participants.Where(p => !string.IsNullOrWhiteSpace(p.Email) && p.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)).ToList();
             if (!gmailParticipants.Any())
@@ -728,7 +725,9 @@ namespace G_Tara
             var hostName = !string.IsNullOrWhiteSpace(gala.HostName)
                 ? gala.HostName
                 : _currentHost?.Name ?? "Host";
-            var hostEmail = _currentHost?.Email ?? string.Empty;
+            var hostEmail = ResolveHostEmail(gala);
+            var hostIdentity = _currentHost ?? new Host { Name = hostName, Email = hostEmail };
+            var hostSignature = hostIdentity.GetEmailSignature();
 
             string? smtpUser = Environment.GetEnvironmentVariable("GMAIL_USER");
             string? smtpPass = Environment.GetEnvironmentVariable("GMAIL_PASS");
@@ -750,13 +749,7 @@ namespace G_Tara
                 gala.ScheduledDate
              );
 
-            var tips = weather != null //Gives tips depending on the Weather conditions
-                ? _weatherService.GetWeatherTips(weather)
-                : new List<string> { "Weather data unavailable. Please check conditions manually." };
-
-            var extraTips = BuildAdditionalTips(gala, weather);
-            var allTips = tips
-                .Concat(extraTips)
+            var allTips = _weatherService.GetEmailTips(gala, weather)
                 .Where(t => !string.IsNullOrWhiteSpace(t))
                 .Distinct()
                 .ToList();
@@ -772,6 +765,11 @@ namespace G_Tara
                 ? $"{weather.Description}, {weather.Temperature}°C, Humidity {weather.Humidity}%, Wind {weather.WindSpeed} km/h"
                 : "Weather data unavailable.";
 
+            var locationSection = BuildLocationSection(gala);
+            var locationBlock = string.IsNullOrWhiteSpace(locationSection)
+                ? string.Empty
+                : $"{locationSection}\n";
+
 
             foreach (var participant in gmailParticipants)
             {
@@ -780,7 +778,7 @@ namespace G_Tara
                     var mail = new System.Net.Mail.MailMessage(smtpUser, participant.Email)
                     {
                         Subject = $"Gala Plan: {gala.Name}",
-                        Body = $"Tara na, {participant.Name}!\n" +
+                        Body = $"{participant.GetEmailGreeting()}\n" +
                         $"Things are about to get exciting! Your upcoming Gala is just around the corner!\n" +
                         $"Here are the Gala Details:\n\n" +
                         $"GALA DETAILS\n" +
@@ -788,8 +786,9 @@ namespace G_Tara
                         $"Date: {gala.ScheduledDate:yyyy-MM-dd}\n" +
                         $"Location: {gala.Location}\n" +
                         $"Plan: {gala.Plan}\n\n" +
-                        $"HOST\n" +
-                        $"Organizer: {hostName}\n" +
+                        locationBlock +
+                        $"\nHOST\n" +
+                        $"{hostSignature}\n" +
                         (string.IsNullOrWhiteSpace(hostEmail) ? string.Empty : $"Contact: {hostEmail}\n") +
                         $"\n" +
                         $"WEATHER\n" +
@@ -812,51 +811,92 @@ namespace G_Tara
             MessageBox.Show("Plan details sent to all participants' Gmail addresses.");
         }
 
-        private List<string> BuildAdditionalTips(Gala gala, WeatherData? weather)
+        private string ResolveHostEmail(Gala gala)
         {
-            var tips = new List<string>();
-
-            if (!string.IsNullOrWhiteSpace(gala.Location))
+            if (!string.IsNullOrWhiteSpace(_currentHost?.Email))
             {
-                tips.Add($"Confirm the meeting point around {gala.Location}.");
+                return _currentHost.Email;
             }
 
-            if (gala.LocationItems != null && gala.LocationItems.Count > 0)
+            if (!string.IsNullOrWhiteSpace(gala.HostName))
             {
-                var suggested = gala.LocationItems
-                    .Select(l => l.Name)
-                    .Where(n => !string.IsNullOrWhiteSpace(n))
-                    .Distinct()
-                    .Take(3)
-                    .ToList();
+                var selectedHost = gala.Participants.FirstOrDefault(p =>
+                    !string.IsNullOrWhiteSpace(p.Email) &&
+                    string.Equals(p.Name, gala.HostName, StringComparison.OrdinalIgnoreCase));
 
-                if (suggested.Count > 0)
+                if (selectedHost != null)
                 {
-                    tips.Add($"Suggested nearby spots: {string.Join(", ", suggested)}.");
+                    return selectedHost.Email;
+                }
+
+                var allParticipants = _participantsDataService.LoadParticipants();
+                var savedHost = allParticipants.FirstOrDefault(p =>
+                    !string.IsNullOrWhiteSpace(p.Email) &&
+                    string.Equals(p.Name, gala.HostName, StringComparison.OrdinalIgnoreCase));
+
+                if (savedHost != null)
+                {
+                    return savedHost.Email;
                 }
             }
 
-            if (gala.Participants != null && gala.Participants.Count >= 8)
+            return string.Empty;
+        }
+
+        private static string BuildLocationSection(Gala gala)
+        {
+            if (gala.LocationItems == null || gala.LocationItems.Count == 0)
             {
-                tips.Add("Consider coordinating transport or carpooling for a smoother arrival.");
+                return string.Empty;
             }
 
-            if (gala.Participants == null || gala.Participants.Count == 0)
+            var lines = new StringBuilder();
+            lines.AppendLine("SELECTED LOCATIONS");
+
+            foreach (var item in gala.LocationItems)
             {
-                tips.Add("Invite participants so everyone receives the latest plan.");
+                var name = string.IsNullOrWhiteSpace(item.Name) ? "Location" : item.Name;
+                var category = string.IsNullOrWhiteSpace(item.Category) ? string.Empty : $" ({item.Category})";
+                lines.AppendLine($"- {name}{category}");
+
+                var mapLink = BuildGoogleMapsLink(item);
+                if (!string.IsNullOrWhiteSpace(mapLink))
+                {
+                    lines.AppendLine($"  Map: {mapLink}");
+                }
             }
 
-            if (weather != null && weather.Description.Contains("rain", StringComparison.OrdinalIgnoreCase))
+            return lines.ToString().TrimEnd();
+        }
+
+        private static string BuildGoogleMapsLink(LocationItem item)
+        {
+            var hasCoordinates = item.Latitude != 0 || item.Longitude != 0;
+            if (hasCoordinates)
             {
-                tips.Add("Plan a covered meet-up spot in case of rain.");
+                var lat = item.Latitude.ToString(CultureInfo.InvariantCulture);
+                var lon = item.Longitude.ToString(CultureInfo.InvariantCulture);
+                return $"https://www.google.com/maps/search/?api=1&query={lat},{lon}";
             }
 
-            if (weather != null && weather.Description.Contains("clear", StringComparison.OrdinalIgnoreCase))
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(item.Name))
             {
-                tips.Add("If outdoors, bring sun protection and water.");
+                parts.Add(item.Name);
             }
 
-            return tips;
+            if (!string.IsNullOrWhiteSpace(item.Address))
+            {
+                parts.Add(item.Address);
+            }
+
+            if (parts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var query = Uri.EscapeDataString(string.Join(", ", parts));
+            return $"https://www.google.com/maps/search/?api=1&query={query}";
         }
 
         private void dgvGalas_CellContentClick(object sender, DataGridViewCellEventArgs e)
