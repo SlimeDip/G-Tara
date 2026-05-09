@@ -639,13 +639,15 @@ namespace G_Tara
             ClientSize = new Size(920, 640);
             Controls.Add(container);
             Font = new Font("Segoe UI", 8.75F);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
+            FormBorderStyle = FormBorderStyle.None;
             Name = "AddEditGalaForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "ADD/EDIT GALA DETAILS";
             Load += AddEditGalaForm_Load;
+            
+            // Create custom title bar
+            CreateCustomTitleBar();
+            
             container.ResumeLayout(false);
             scrollPanel.ResumeLayout(false);
             mainPanel.ResumeLayout(false);

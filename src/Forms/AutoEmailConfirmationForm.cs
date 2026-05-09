@@ -1,18 +1,129 @@
 using G_Tara.Models;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace G_Tara
 {
     public partial class AutoEmailConfirmationForm : Form
     {
+        [DllImport("user32.dll")]
+        private static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        private const int WM_NCLBUTTONDOWN = 0x00A1;
+        private const int HTCAPTION = 0x0002;
+
+        private Panel pnlTitleBar;
+        private Button btnWindowMinimize;
+        private Button btnWindowMaximize;
+        private Button btnWindowClose;
+        private Label lblWindowTitle;
         public AutoEmailConfirmationForm(Gala gala)
         {
             InitializeComponent();
             txtPlanDetails.Text = gala.Plan;
             txtParticipants.Text = string.Join("\r\n", gala.Participants.Select(p => p.Email));
 
+            CreateCustomTitleBar();
+            ApplyRoundedFormRegion();
             ApplyGaraTheme();
+            this.Load += (s, e) => LayoutWindowButtons();
+            this.Resize += (s, e) => LayoutWindowButtons();
+        }
+
+        private void CreateCustomTitleBar()
+        {
+            Color titleBarColor = Color.FromArgb(241, 206, 211);
+            
+            pnlTitleBar = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 34,
+                BackColor = titleBarColor
+            };
+            pnlTitleBar.MouseDown += OnTitleBarMouseDown;
+
+            lblWindowTitle = new Label
+            {
+                Text = "Auto Email Confirmation",
+                AutoSize = true,
+                Location = new Point(12, 8),
+                Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(80, 40, 45),
+                BackColor = Color.Transparent
+            };
+            lblWindowTitle.MouseDown += OnTitleBarMouseDown;
+
+            btnWindowMinimize = new Button
+            {
+                Text = "♡",
+                Size = new Size(30, 28),
+                Location = new Point(this.ClientSize.Width - 102, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(117, 71, 76),
+                Font = new Font("Segoe UI Symbol", 12F, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            btnWindowMinimize.FlatAppearance.BorderSize = 0;
+            btnWindowMinimize.FlatAppearance.MouseOverBackColor = Color.FromArgb(235, 197, 203);
+            btnWindowMinimize.FlatAppearance.MouseDownBackColor = Color.FromArgb(223, 181, 188);
+            btnWindowMinimize.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
+
+            btnWindowClose = new Button
+            {
+                Text = "♥",
+                Size = new Size(30, 28),
+                Location = new Point(this.ClientSize.Width - 44, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(117, 71, 76),
+                Font = new Font("Segoe UI Symbol", 12F, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            btnWindowClose.FlatAppearance.BorderSize = 0;
+            btnWindowClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(235, 197, 203);
+            btnWindowClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(223, 181, 188);
+            btnWindowClose.Click += (s, e) => this.Close();
+
+            pnlTitleBar.Controls.Add(lblWindowTitle);
+            pnlTitleBar.Controls.Add(btnWindowMinimize);
+            pnlTitleBar.Controls.Add(btnWindowClose);
+            
+            this.Controls.Add(pnlTitleBar);
+        }
+
+        private void ApplyRoundedFormRegion()
+        {
+            if (this.Width <= 0 || this.Height <= 0) return;
+            using var path = CreateRoundedRectPath(new Rectangle(0, 0, this.Width - 1, this.Height - 1), 20);
+            this.Region = new Region(path);
+        }
+
+        private void OnTitleBarMouseDown(object? sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            ReleaseCapture();
+            SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+        }
+
+        private void LayoutWindowButtons()
+        {
+            if (btnWindowMinimize == null || btnWindowClose == null || pnlTitleBar == null) return;
+            btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - 8, 2);
+            btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - 4, 2);
+        }
+
+        private void AutoEmailConfirmationForm_SizeChanged(object? sender, EventArgs e)
+        {
+            ApplyRoundedFormRegion();
         }
 
         private void ApplyGaraTheme()

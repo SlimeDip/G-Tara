@@ -2,11 +2,21 @@
 using G_Tara.Services;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace G_Tara
 {
     public partial class ParticipantsManagementForm : Form
     {
+        [DllImport("user32.dll")]
+        private static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        private const int WM_NCLBUTTONDOWN = 0x00A1;
+        private const int HTCAPTION = 0x0002;
+
         private Participant? _selectedParticipant = null;
         private Panel? _selectedCardPanel = null;
         private Button btnFooterEdit;
@@ -16,17 +26,24 @@ namespace G_Tara
         private readonly ParticipantsDataService _dataService;
         private readonly Host? _currentHost;
         private List<Participant> _participants;
+        private readonly System.Media.SoundPlayer _hoverSound = new System.Media.SoundPlayer();
 
         private FlowLayoutPanel cardContainer;
         private TextBox txtSearch;
         private Button btnAdd;
         private Button btnClose;
+        private Panel pnlTitleBar;
+        private Button btnWindowMinimize;
+        private Button btnWindowMaximize;
+        private Button btnWindowClose;
+        private Label lblWindowTitle;
 
         public ParticipantsManagementForm(ParticipantsDataService dataService, Host? currentHost)
         {
             _dataService = dataService;
             _currentHost = currentHost;
             _participants = new List<Participant>();
+            LoadSounds();
             InitializeComponent();
         }
 
@@ -37,6 +54,8 @@ namespace G_Tara
             Color galaText = Color.FromArgb(100, 60, 65);
             Color galaDeepPink = Color.FromArgb(189, 126, 131);
             Color darkPinkText = Color.FromArgb(120, 40, 50); // Dark pink for button text
+            Color searchPink = Color.FromArgb(248, 225, 228);
+
 
             this.Text = "Manage Participants";
             this.Size = new Size(900, 650); // Made slightly larger for cards
@@ -44,8 +63,73 @@ namespace G_Tara
             this.BackColor = galaPinkLight;
             this.Font = new Font("Segoe UI Semibold", 9.5F);
             this.ForeColor = galaText;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.SizeChanged += (s, e) => ApplyRoundedFormRegion();
+            ApplyRoundedFormRegion();
 
-            Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 100, BackColor = Color.Transparent };
+            pnlTitleBar = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 34,
+                BackColor = Color.FromArgb(241, 206, 211)
+            };
+            pnlTitleBar.MouseDown += OnTitleBarMouseDown;
+
+            lblWindowTitle = new Label
+            {
+                Text = "Manage Participants",
+                AutoSize = true,
+                Location = new Point(12, 8),
+                Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(80, 40, 45),
+                BackColor = Color.Transparent
+            };
+            lblWindowTitle.MouseDown += OnTitleBarMouseDown;
+
+            btnWindowMinimize = new Button
+            {
+                Text = "♡",
+                Size = new Size(30, 28),
+                Location = new Point(this.ClientSize.Width - 102, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(117, 71, 76),
+                Font = new Font("Segoe UI Symbol", 12F, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            btnWindowMinimize.FlatAppearance.BorderSize = 0;
+            btnWindowMinimize.FlatAppearance.MouseOverBackColor = Color.FromArgb(235, 197, 203);
+            btnWindowMinimize.FlatAppearance.MouseDownBackColor = Color.FromArgb(223, 181, 188);
+            btnWindowMinimize.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
+
+
+            btnWindowClose = new Button
+            {
+                Text = "♥",
+                Size = new Size(30, 28),
+                Location = new Point(this.ClientSize.Width - 34, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(117, 71, 76),
+                Font = new Font("Segoe UI Symbol", 12F, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            btnWindowClose.FlatAppearance.BorderSize = 0;
+            btnWindowClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(235, 197, 203);
+            btnWindowClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(223, 181, 188);
+            btnWindowClose.Click += (s, e) => this.Close();
+
+            pnlTitleBar.Controls.Add(lblWindowTitle);
+            pnlTitleBar.Controls.Add(btnWindowMinimize);
+            pnlTitleBar.Controls.Add(btnWindowClose);
+            this.Controls.Add(pnlTitleBar);
+
+            pnlTitleBar.BringToFront();
+            LayoutWindowButtons();
+
+            Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 96, BackColor = Color.Transparent };
             Panel bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 100, BackColor = galaDeepPink, Padding = new Padding(0, 18, 0, 18) };
 
             // Use a TableLayoutPanel to perfectly center the search container
@@ -54,20 +138,36 @@ namespace G_Tara
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500f)); // Search box width
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
 
-            Panel searchContainer = new Panel { Size = new Size(500, 50), BackColor = galaWhite, Anchor = AnchorStyles.None };
+            Panel searchContainer = new Panel { Size = new Size(500, 50), BackColor = searchPink, Anchor = AnchorStyles.None, Padding = new Padding(18, 10, 18, 10) };
+            TableLayoutPanel searchLayout = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                RowCount = 1,
+                BackColor = Color.Transparent
+            };
+            searchLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 34f));
+            searchLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
+            Label lblSearchIcon = new Label
+            {
+                Text = "🔍",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+                AutoSize = false,
+                Font = new Font("Segoe UI", 12),
+                BackColor = Color.Transparent
+            };
             txtSearch = new TextBox
             {
-                Width = 400,
-                Location = new Point(60, 13),
+                Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.None,
                 Font = new Font("Segoe UI", 12),
-                PlaceholderText = "Search participants..."
+                PlaceholderText = "Search participants...",
+                BackColor = searchPink
             };
-
-            // Search Icon (using a label as a placeholder)
-            Label lblSearchIcon = new Label { Text = "🔍", Location = new Point(20, 13), AutoSize = true, Font = new Font("Segoe UI", 12) };
-
-            searchContainer.Controls.AddRange(new Control[] { lblSearchIcon, txtSearch });
+            searchLayout.Controls.Add(lblSearchIcon, 0, 0);
+            searchLayout.Controls.Add(txtSearch, 1, 0);
+            searchContainer.Controls.Add(searchLayout);
             // Make search container pill-shaped
             searchContainer.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, 500, 50), 25));
 
@@ -146,16 +246,21 @@ namespace G_Tara
             ApplyPillButtonStyle(btnFooterRemove, galaWhite, darkPinkText);
             ApplyPillButtonStyle(btnFooterClose, galaWhite, darkPinkText);
 
+
+            this.Controls.Add(bottomPanel);
             this.Controls.Add(cardContainer);
             this.Controls.Add(topPanel);
-            this.Controls.Add(bottomPanel); // Add this last so it docks correctly
+
+
 
             ApplyGaraTheme();
             this.Load += ParticipantsManagementForm_Load;
+            this.Resize += (s, e) => LayoutWindowButtons();
         }
 
         private void ParticipantsManagementForm_Load(object? sender, EventArgs e)
         {
+            LayoutWindowButtons();
             if (!DesignMode)
             {
                 LoadParticipants();
@@ -212,7 +317,8 @@ namespace G_Tara
         private void ApplyPillButtonStyle(Button btn, Color backColor, Color textColor)
         {
             btn.FlatStyle = FlatStyle.Flat;
-            btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.BorderSize = 2;
+            btn.FlatAppearance.BorderColor = Color.FromArgb(175, 118, 126);
             btn.BackColor = backColor;
             btn.ForeColor = textColor;
             btn.Font = new Font("Segoe UI", 11, FontStyle.Bold);
@@ -226,7 +332,11 @@ namespace G_Tara
             ApplyRegion();
             btn.Resize += (s, e) => ApplyRegion();
             // Hover effect
-            btn.MouseEnter += (s, e) => btn.BackColor = Color.FromArgb(240, 240, 240);
+            btn.MouseEnter += (s, e) =>
+            {
+                btn.BackColor = Color.FromArgb(240, 240, 240);
+                TryPlayHoverSound();
+            };
             btn.MouseLeave += (s, e) => btn.BackColor = backColor;
         }
 
@@ -234,13 +344,14 @@ namespace G_Tara
         {
             Color cardBack = Color.FromArgb(255, 248, 248);
             // Width 410 allows two cards to fit side-by-side in a 900-950px form
-            Panel card = new Panel { Size = new Size(360, 160), Margin = new Padding(15), BackColor = cardBack, Padding = new Padding(5) };
+            Panel card = new Panel { Size = new Size(360, 174), Margin = new Padding(15), BackColor = cardBack, Padding = new Padding(12) };
             TableLayoutPanel mainLayout = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
                 RowCount = 1,
                 Padding = new Padding(10),
+                Margin = new Padding(0),
                 BackColor = cardBack
             };
             mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 130f));
@@ -294,15 +405,27 @@ namespace G_Tara
             mainLayout.Controls.Add(picCircle, 0, 0);
             mainLayout.Controls.Add(textFlow, 1, 0);
             card.Controls.Add(mainLayout);
+            void ApplyCardRegion()
+            {
+                if (card.Width <= 0 || card.Height <= 0) return;
+                using var regionPath = CreateRoundedRectPath(new Rectangle(0, 0, card.Width - 1, card.Height - 1), 20);
+                card.Region = new Region(regionPath);
+            }
+            ApplyCardRegion();
+            card.Resize += (s, e) => ApplyCardRegion();
             card.Paint += (s, e) => {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                RectangleF borderRect = new RectangleF(1.5f, 1.5f, card.Width - 4f, card.Height - 4f);
-                using var path = CreateRoundedRectPath(Rectangle.Round(borderRect), 20);
-                card.Region = new Region(path);
+                Rectangle borderRect = new Rectangle(0, 0, card.Width - 1, card.Height - 1);
+                using var path = CreateRoundedRectPath(borderRect, 20);
+                using (var fillBrush = new SolidBrush(cardBack))
+                {
+                    e.Graphics.FillPath(fillBrush, path);
+                }
                 bool isSelected = _selectedParticipant?.Id == p.Id;
-                Color borderColor = isSelected ? Color.FromArgb(128, 35, 45) : Color.FromArgb(180, 140, 145);
-                float borderWidth = isSelected ? 4.5f : 2f;
+                Color borderColor = isSelected ? Color.FromArgb(128, 35, 45) : Color.FromArgb(172, 112, 121);
+                float borderWidth = isSelected ? 3.8f : 2.2f;
                 using var pen = new Pen(borderColor, borderWidth);
+                pen.Alignment = PenAlignment.Inset;
                 e.Graphics.DrawPath(pen, path);
             };
             // Selection logic (Clicking card enables footer buttons)
@@ -471,6 +594,65 @@ namespace G_Tara
 
         private static Color Interpolate(Color b, Color t, float p) =>
             Color.FromArgb((int)(b.R + (t.R - b.R) * p), (int)(b.G + (t.G - b.G) * p), (int)(b.B + (t.B - b.B) * p));
+
+        private void LoadSounds()
+        {
+            try
+            {
+                string[] candidates =
+                {
+                    Path.Combine(AppContext.BaseDirectory, "Assets", "hover.wav"),
+                    Path.Combine(AppContext.BaseDirectory, "assets", "hover.wav")
+                };
+                foreach (string soundPath in candidates)
+                {
+                    if (!File.Exists(soundPath)) continue;
+                    _hoverSound.SoundLocation = soundPath;
+                    _hoverSound.Load();
+                    break;
+                }
+            }
+            catch
+            {
+                // Ignore load failures so the form still works.
+            }
+        }
+
+        private void TryPlayHoverSound()
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_hoverSound.SoundLocation))
+                {
+                    _hoverSound.Play();
+                }
+            }
+            catch
+            {
+                // Ignore playback errors.
+            }
+        }
+
+        private void ApplyRoundedFormRegion()
+        {
+            if (this.Width <= 0 || this.Height <= 0) return;
+            using var path = CreateRoundedRectPath(new Rectangle(0, 0, this.Width - 1, this.Height - 1), 20);
+            this.Region = new Region(path);
+        }
+
+        private void OnTitleBarMouseDown(object? sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            ReleaseCapture();
+            SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+        }
+
+        private void LayoutWindowButtons()
+        {
+            if (btnWindowMinimize == null || btnWindowMaximize == null || btnWindowClose == null || pnlTitleBar == null) return;
+            btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - 8, 2);
+            btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - 8, 2);
+        }
 
         private static System.Drawing.Drawing2D.GraphicsPath CreateRoundedRectPath(Rectangle r, int rad)
         {

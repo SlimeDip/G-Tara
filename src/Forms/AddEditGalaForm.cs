@@ -39,6 +39,7 @@ namespace G_Tara
             InitializeComponent();
             ApplyGaraTheme();
             WireUiEvents();
+            ApplyRoundedFormRegion();
             _gala = gala ?? new Gala();
             _dataService = dataService;
             _participantsDataService = participantsDataService ?? new ParticipantsDataService();
@@ -50,6 +51,107 @@ namespace G_Tara
             _selectedParticipants = new List<Participant>(_gala.Participants);
         }
 
+        private void CreateCustomTitleBar()
+        {
+            Color titleBarColor = Color.FromArgb(241, 206, 211);
+            
+            pnlTitleBar = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 34,
+                BackColor = titleBarColor
+            };
+            pnlTitleBar.MouseDown += OnTitleBarMouseDown;
+
+            lblWindowTitle = new Label
+            {
+                Text = "ADD/EDIT GALA DETAILS",
+                AutoSize = true,
+                Location = new Point(12, 8),
+                Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(80, 40, 45),
+                BackColor = Color.Transparent
+            };
+            lblWindowTitle.MouseDown += OnTitleBarMouseDown;
+
+            btnWindowMinimize = new Button
+            {
+                Text = "♡",
+                Size = new Size(30, 28),
+                Location = new Point(this.ClientSize.Width - 74, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(117, 71, 76),
+                Font = new Font("Segoe UI Symbol", 12F, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            btnWindowMinimize.FlatAppearance.BorderSize = 0;
+            btnWindowMinimize.FlatAppearance.MouseOverBackColor = Color.FromArgb(235, 197, 203);
+            btnWindowMinimize.FlatAppearance.MouseDownBackColor = Color.FromArgb(223, 181, 188);
+            btnWindowMinimize.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
+
+            btnWindowClose = new Button
+            {
+                Text = "♥",
+                Size = new Size(30, 28),
+                Location = new Point(this.ClientSize.Width - 44, 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(117, 71, 76),
+                Font = new Font("Segoe UI Symbol", 12F, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            btnWindowClose.FlatAppearance.BorderSize = 0;
+            btnWindowClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(235, 197, 203);
+            btnWindowClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(223, 181, 188);
+            btnWindowClose.Click += (s, e) => this.Close();
+
+            pnlTitleBar.Controls.Add(lblWindowTitle);
+            pnlTitleBar.Controls.Add(btnWindowMinimize);
+            pnlTitleBar.Controls.Add(btnWindowClose);
+
+            this.Controls.Add(pnlTitleBar);
+            pnlTitleBar.BringToFront();
+
+            this.Resize += (sender, args) =>
+            {
+                if (btnWindowMinimize != null && btnWindowClose != null && pnlTitleBar != null)
+                {
+                    btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - 8, 2);
+                    btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - 8, 2);
+                }
+            };
+        }
+
+        private static GraphicsPath CreateRoundedRectPath(Rectangle rect, int radius)
+        {
+            var path = new GraphicsPath();
+            int d = radius * 2;
+            path.AddArc(rect.X, rect.Y, d, d, 180, 90);
+            path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90);
+            path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90);
+            path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
+
+        private void ApplyRoundedFormRegion()
+        {
+            if (this.Width <= 0 || this.Height <= 0) return;
+            using var path = CreateRoundedRectPath(new Rectangle(0, 0, this.Width - 1, this.Height - 1), 20);
+            this.Region = new Region(path);
+        }
+
+        private void OnTitleBarMouseDown(object? sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            ReleaseCapture();
+            SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+        }
+
+        
         private void ApplyGaraTheme()
         {
             Color btnBack = Color.FromArgb(248, 230, 231);
@@ -147,6 +249,9 @@ namespace G_Tara
         private void AddEditGalaForm_Load(object sender, EventArgs e)
         {
             InitializeControls();
+            
+            // Handle form resize to maintain rounded corners
+            this.SizeChanged += (s, e) => ApplyRoundedFormRegion();
         }
 
         private void InitializeControls()
@@ -573,7 +678,7 @@ namespace G_Tara
                 Location = new Point(5, 96),
                 BackColor = isSelected ? Color.FromArgb(74, 164, 95) : Color.FromArgb(224, 158, 87)
             };
-            statusDot.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, statusDot.Width, statusDot.Height), 4));
+            statusDot.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, statusDot.Width, statusDot.Height), 4));
 
             card.Controls.Add(avatar);
             card.Controls.Add(nameLabel);
@@ -609,7 +714,7 @@ namespace G_Tara
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 var borderRect = new Rectangle(1, 1, card.Width - 3, card.Height - 3);
-                using var path = CreateRoundedRectPath(borderRect, 14);
+                using var path = FormUtilities.CreateRoundedRectPath(borderRect, 14);
                 using var fillBrush = new SolidBrush(Color.FromArgb(255, 248, 249));
                 e.Graphics.FillPath(fillBrush, path);
                 using var pen = new Pen(isSelected ? Color.FromArgb(104, 179, 123) : Color.FromArgb(214, 188, 191), isSelected ? 1.8f : 1.2f);
@@ -879,8 +984,7 @@ namespace G_Tara
                 // Fit within rightPanel width (397px - 20px padding = 377px usable)
                 participantsPanel.Size = new Size(370, 310);
                 participantsPanel.Location = new Point(10, 10);
-                participantsPanel.Region = new Region(CreateRoundedRectPath(
-                    new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), 14));
+                participantsPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), 14));
             }
             lblParticipants.Font = new Font("Segoe UI Semibold", 9F);
             lblParticipants.ForeColor = text;
@@ -895,8 +999,7 @@ namespace G_Tara
                 planPanel.BackColor = card;
                 planPanel.Size = new Size(370, 200);
                 planPanel.Location = new Point(10, 328);
-                planPanel.Region = new Region(CreateRoundedRectPath(
-                    new Rectangle(0, 0, planPanel.Width, planPanel.Height), 14));
+                planPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, planPanel.Width, planPanel.Height), 14));
             }
             lblPlan.Location = new Point(14, 12);
             lblPlan.Font = new Font("Segoe UI Semibold", 9F);
@@ -939,9 +1042,9 @@ namespace G_Tara
         private void OnDatePanelPaint(object? sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            // Draw rounded rect around the textbox area only
+            // Draw rounded rect around textbox area only
             var rect = new Rectangle(0, 1, txtDateRange.Width + 12, datePanel.Height - 3);
-            using var path = CreateRoundedRectPath(rect, 10);
+            using var path = FormUtilities.CreateRoundedRectPath(rect, 10);
             using var brush = new SolidBrush(Color.FromArgb(248, 232, 235));
             e.Graphics.FillPath(brush, path);
             using var pen = new Pen(Color.FromArgb(214, 147, 156), 1.5f);
@@ -952,7 +1055,7 @@ namespace G_Tara
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var rect = new Rectangle(0, 1, txtLocation.Width + 12, locationPanel.Height - 3);
-            using var path = CreateRoundedRectPath(rect, 10);
+            using var path = FormUtilities.CreateRoundedRectPath(rect, 10);
             using var brush = new SolidBrush(Color.FromArgb(248, 232, 235));
             e.Graphics.FillPath(brush, path);
             using var pen = new Pen(Color.FromArgb(214, 147, 156), 1.5f);
@@ -960,7 +1063,18 @@ namespace G_Tara
         }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, ref System.Drawing.Rectangle lParam);
+        private static extern bool ReleaseCapture();
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        private const int WM_NCLBUTTONDOWN = 0x00A1;
+        private const int HTCAPTION = 0x0002;
+
+        private Panel pnlTitleBar;
+        private Button btnWindowMinimize;
+        private Button btnWindowClose;
+        private Label lblWindowTitle;
 
         private static void CenterTextBoxVertically(TextBox tb)
         {
@@ -968,7 +1082,7 @@ namespace G_Tara
             int fontHeight = tb.Font.Height;
             int topPad = Math.Max(0, (tb.Height - fontHeight) / 2 - 1);
             var rect = new System.Drawing.Rectangle(2, topPad, tb.Width - 4, tb.Height - topPad);
-            SendMessage(tb.Handle, EM_SETRECT, IntPtr.Zero, ref rect);
+            SendMessage(tb.Handle, EM_SETRECT, IntPtr.Zero, IntPtr.Zero);
         }
 
         private void StylePillButtonWithDivider(Button btn)
@@ -997,7 +1111,7 @@ namespace G_Tara
                 var rect = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
 
                 // Pill background
-                using var path = CreateRoundedRectPath(rect, btn.Height / 2);
+                using var path = FormUtilities.CreateRoundedRectPath(rect, btn.Height / 2);
                 using var brush = new SolidBrush(fill);
                 g.FillPath(brush, path);
                 using var borderPen = new Pen(Color.FromArgb(170, 110, 125), 1.2f);
@@ -1049,7 +1163,7 @@ namespace G_Tara
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 Color fill = isHover ? hoverFill : fillColor;
                 var rect = new Rectangle(0, 0, btn.Width - 1, btn.Height - 1);
-                using var path = CreateRoundedRectPath(rect, btn.Height / 2);
+                using var path = FormUtilities.CreateRoundedRectPath(rect, btn.Height / 2);
                 using var brush = new SolidBrush(fill);
                 g.FillPath(brush, path);
                 TextRenderer.DrawText(g, btn.Text, btn.Font, rect, textColor,
@@ -1086,7 +1200,7 @@ namespace G_Tara
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 var rect = new Rectangle(0, 0, wrapper.Width - 1, wrapper.Height - 1);
-                using var path = CreateRoundedRectPath(rect, radius);
+                using var path = FormUtilities.CreateRoundedRectPath(rect, radius);
                 using var brush = new SolidBrush(fillColor);
                 e.Graphics.FillPath(brush, path);
                 using var pen = new Pen(borderColor, 1.5f);
@@ -1121,7 +1235,7 @@ namespace G_Tara
                 g.SmoothingMode = SmoothingMode.AntiAlias;
 
                 var rect = new Rectangle(0, 0, _categoryPill.Width - 1, _categoryPill.Height - 1);
-                using var path = CreateRoundedRectPath(rect, _categoryPill.Height / 2);
+                using var path = FormUtilities.CreateRoundedRectPath(rect, _categoryPill.Height / 2);
                 using var bgBrush = new SolidBrush(Color.FromArgb(248, 232, 235));
                 g.FillPath(bgBrush, path);
                 using var borderPen = new Pen(Color.FromArgb(214, 147, 156), 1.2f);
@@ -1214,7 +1328,7 @@ namespace G_Tara
 
                 // Pill background
                 var rect = new Rectangle(0, 0, _statusPill.Width - 1, _statusPill.Height - 1);
-                using var path = CreateRoundedRectPath(rect, _statusPill.Height / 2);
+                using var path = FormUtilities.CreateRoundedRectPath(rect, _statusPill.Height / 2);
                 using var bgBrush = new SolidBrush(Color.FromArgb(248, 232, 235));
                 g.FillPath(bgBrush, path);
                 using var borderPen = new Pen(Color.FromArgb(214, 147, 156), 1.2f);
@@ -1230,7 +1344,7 @@ namespace G_Tara
                 for (int i = 0; i < statusColors.Length; i++)
                 {
                     var barRect = new Rectangle(barX + i * (barW + barGap), barY, barW, barH);
-                    using var barPath = CreateRoundedRectPath(barRect, 4);
+                    using var barPath = FormUtilities.CreateRoundedRectPath(barRect, 4);
                     using var barBrush = new SolidBrush(statusColors[i]);
                     g.FillPath(barBrush, barPath);
                 }
@@ -1435,18 +1549,6 @@ namespace G_Tara
 
         private static Color Interpolate(Color b, Color t, float p) =>
             Color.FromArgb((int)(b.R + (t.R - b.R) * p), (int)(b.G + (t.G - b.G) * p), (int)(b.B + (t.B - b.B) * p));
-
-        private static System.Drawing.Drawing2D.GraphicsPath CreateRoundedRectPath(Rectangle r, int rad)
-        {
-            var p = new System.Drawing.Drawing2D.GraphicsPath();
-            int d = rad * 2;
-            p.AddArc(r.X, r.Y, d, d, 180, 90);
-            p.AddArc(r.Right - d, r.Y, d, d, 270, 90);
-            p.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
-            p.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
-            p.CloseFigure();
-            return p;
-        }
 
         public class RoundedButtonStyleState
         {
