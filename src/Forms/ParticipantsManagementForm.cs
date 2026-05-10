@@ -30,10 +30,8 @@ namespace G_Tara
         private FlowLayoutPanel cardContainer;
         private TextBox txtSearch;
         private Button btnAdd;
-        private Button btnClose;
         private Panel pnlTitleBar;
         private Button btnWindowMinimize;
-        private Button btnWindowMaximize;
         private Button btnWindowClose;
         private Label lblWindowTitle;
 
@@ -171,24 +169,6 @@ namespace G_Tara
 
             centerTable.Controls.Add(searchContainer, 1, 0);
             topPanel.Controls.Add(centerTable);
-
-
-            btnAdd = new Button
-            {
-                Text = "+ Add Participant",
-                Location = new Point(730, 18),
-                Size = new Size(140, 32),
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
-            };
-
-            btnClose = new Button
-            {
-                Text = "Close",
-                Location = new Point(0, 0),
-                Visible = false
-            };
-
-            topPanel.Controls.Add(btnAdd);
 
             // --- MAIN AREA: FlowLayoutPanel for Cards ---
             cardContainer = new FlowLayoutPanel
@@ -535,9 +515,11 @@ namespace G_Tara
             Color btnHover = Color.FromArgb(235, 190, 195);
             Color btnDown = Color.FromArgb(200, 150, 155);
 
-            // Apply to all buttons including search
-            ApplyRoundedButtonStyle(btnAdd, btnBack, btnBorder, btnHover, btnDown, null);
-            ApplyRoundedButtonStyle(btnClose, btnBack, btnBorder, btnHover, btnDown, null);
+            // Apply to all footer buttons
+            ApplyRoundedButtonStyle(btnFooterAdd, btnBack, btnBorder, btnHover, btnDown, null);
+            ApplyRoundedButtonStyle(btnFooterEdit, btnBack, btnBorder, btnHover, btnDown, null);
+            ApplyRoundedButtonStyle(btnFooterRemove, btnBack, btnBorder, btnHover, btnDown, null);
+            ApplyRoundedButtonStyle(btnFooterClose, btnBack, btnBorder, btnHover, btnDown, null);
         }
 
         private static void ApplyRoundedButtonStyle(Button btn, Color back, Color border, Color hover, Color down, System.Media.SoundPlayer? hoverSound)
@@ -647,7 +629,7 @@ namespace G_Tara
 
         private void LayoutWindowButtons()
         {
-            if (btnWindowMinimize == null || btnWindowMaximize == null || btnWindowClose == null || pnlTitleBar == null) return;
+            if (btnWindowMinimize == null || btnWindowClose == null || pnlTitleBar == null) return;
             btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - 8, 2);
             btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - 8, 2);
         }

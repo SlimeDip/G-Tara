@@ -290,8 +290,6 @@ namespace G_Tara
             WrapTextBoxWithRoundedPanel(txtName, Color.FromArgb(248, 232, 235), Color.FromArgb(214, 147, 156), 10);
             StylePillButtonWithDivider(btnPickRange);
             StyleDarkPillButton(btnPickMap);
-
-            this.Shown += (s, e) => CenterTextBoxVertically(txtLocation);
         }
 
         private void EnableParticipantControls()
@@ -678,12 +676,6 @@ namespace G_Tara
 
             void Toggle(object? s, EventArgs e)
             {
-                if (!IsHostOrPermitted())
-                {
-                    MessageBox.Show("Only the host can manage participants.", "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
                 if (isSelected)
                     _selectedParticipants.RemoveAll(p => p.Id == participant.Id);
                 else
@@ -753,9 +745,7 @@ namespace G_Tara
                 rightPanel.Padding = new Padding(10, 0, 0, 0);
             }
 
-            picCheckmark.Visible = false;
-            picLocation.Visible = false;
-            picCategory.Visible = false;
+            if (picLogo != null) picLogo.Visible = false;
 
             lblName.Location = new Point(12, 10);
             lblName.Font = new Font("Segoe UI Semibold", 9.2F);
@@ -866,7 +856,7 @@ namespace G_Tara
             _lblCoordinates.Location = new Point(140, 206);
 
             // CATEGORY row — horizontal: icon | label | rounded pill showing selected category
-            _picCategory.Location = new Point(12, 224);
+            _picCategory.Location = new Point(12, 234);
             _picCategory.BackColor = Color.Transparent;
             try
             {
@@ -879,7 +869,7 @@ namespace G_Tara
             if (lblName.Parent != null && !lblName.Parent.Controls.Contains(_picCategory))
                 lblName.Parent.Controls.Add(_picCategory);
 
-            lblCategory.Location = new Point(44, 229);
+            lblCategory.Location = new Point(44, 239);
             lblCategory.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblCategory.ForeColor = text;
             lblCategory.AutoSize = true;
@@ -893,30 +883,30 @@ namespace G_Tara
 
             // SEARCH & DISCOVER LOCATIONS card
             lblSearchResults.Text = "SEARCH & DISCOVER LOCATIONS";
-            lblSearchResults.Location = new Point(12, 268);
+            lblSearchResults.Location = new Point(12, 290);
             lblSearchResults.Font = new Font("Segoe UI Semibold", 8.5F, FontStyle.Bold);
             lblSearchResults.ForeColor = text;
 
-            btnRefreshPlaces.Location = new Point(12, 288);
+            btnRefreshPlaces.Location = new Point(12, 315);
             btnRefreshPlaces.Size = new Size(140, 28);
             btnRefreshPlaces.Text = "Refresh Locations";
 
-            lstSearchResults.Location = new Point(12, 322);
+            lstSearchResults.Location = new Point(12, 350);
             lstSearchResults.Size = new Size(420, 90);
             lstSearchResults.BackColor = Color.FromArgb(255, 246, 248);
             lstSearchResults.BorderStyle = BorderStyle.FixedSingle;
 
-            lblSelected.Location = new Point(12, 418);
+            lblSelected.Location = new Point(12, 450);
             lblSelected.Font = new Font("Segoe UI Semibold", 8.6F, FontStyle.Bold);
             lblSelected.ForeColor = text;
 
-            lstSelectedLocations.Location = new Point(12, 438);
+            lstSelectedLocations.Location = new Point(12, 470);
             lstSelectedLocations.Size = new Size(420, 80);
             lstSelectedLocations.BackColor = Color.FromArgb(255, 246, 248);
             lstSelectedLocations.BorderStyle = BorderStyle.FixedSingle;
 
             // Add + Remove buttons centered side by side below the listbox
-            int btnY = 526;
+            int btnY = 560;
             int btnW = 120;
             int gap = 14;
             int totalBtnsWidth = btnW * 2 + gap;
@@ -930,11 +920,11 @@ namespace G_Tara
             btnRemove.Size = new Size(btnW, 28);
             btnRemove.Text = "Remove Location";
 
-            lblWeatherTitle.Location = new Point(12, 560);
+            lblWeatherTitle.Location = new Point(12, 600);
             lblWeatherTitle.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
             lblWeatherTitle.ForeColor = text;
 
-            weatherPanel.Location = new Point(12, 580);
+            weatherPanel.Location = new Point(12, 620);
             weatherPanel.Size = new Size(430, 34);
             weatherPanel.WrapContents = false;
 
@@ -947,11 +937,11 @@ namespace G_Tara
             lblWeather.Margin = new Padding(0, 8, 0, 0);
 
             // Move Gala Host label+combo INSIDE participants panel header row
-            lblHost.Location = new Point(110, 12);
+            lblHost.Location = new Point(130, 12);
             lblHost.Font = new Font("Segoe UI Semibold", 8.9F);
             lblHost.ForeColor = text;
-            cmbHost.Location = new Point(175, 9);
-            cmbHost.Size = new Size(180, 23);
+            cmbHost.Location = new Point(195, 9);
+            cmbHost.Size = new Size(160, 23);
 
             if (participantsPanel != null)
             {
@@ -1040,13 +1030,6 @@ namespace G_Tara
         private Button btnWindowMinimize;
         private Button btnWindowClose;
         private Label lblWindowTitle;
-
-        private static void CenterTextBoxVertically(TextBox tb)
-        {
-            // EM_SETRECT requires marshalling a RECT struct via lParam.
-            // Implement via P/Invoke with a proper RECT overload if precise centering is needed.
-            // Left as a no-op placeholder; the textbox renders acceptably without it.
-        }
 
         private void StylePillButtonWithDivider(Button btn)
         {
@@ -1182,7 +1165,7 @@ namespace G_Tara
 
             _categoryPill = new Panel
             {
-                Location = new Point(140, 220),
+                Location = new Point(140, 230),
                 Size = new Size(220, 30),
                 BackColor = Color.Transparent,
                 Cursor = Cursors.Hand
@@ -1335,26 +1318,8 @@ namespace G_Tara
             parent.Controls.Add(_statusPill);
         }
 
-        private void OnCategoryButtonClick(object? sender, EventArgs e)
-        {
-            cmbCategory.Parent?.Controls.SetChildIndex(cmbCategory, 0);
-            cmbCategory.Location = new Point(btnAdd.Left, btnAdd.Bottom + 2);
-            cmbCategory.Size = new Size(btnAdd.Width + 30, 24);
-            cmbCategory.Visible = true;
-            cmbCategory.BringToFront();
-            cmbCategory.DroppedDown = true;
-            cmbCategory.Focus();
-        }
-
         private void OnParticipantToggled(object? sender, ItemCheckEventArgs e)
         {
-            if (!IsHostOrPermitted())
-            {
-                e.NewValue = e.CurrentValue;
-                MessageBox.Show("Only the host can manage participants.", "Permission Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             var participant = chkParticipants.Items[e.Index] as Participant;
             if (participant != null)
             {
@@ -1368,11 +1333,6 @@ namespace G_Tara
                     _selectedParticipants.RemoveAll(p => p.Id == participant.Id);
                 }
             }
-        }
-
-        private bool IsHostOrPermitted()
-        {
-            return true;
         }
 
         private void OnSave(object sender, EventArgs e)

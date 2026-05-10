@@ -20,7 +20,6 @@ namespace G_Tara
 
         private Panel pnlTitleBar;
         private Button btnWindowMinimize;
-        private Button btnWindowMaximize;
         private Button btnWindowClose;
         private Label lblWindowTitle;
         public AutoEmailConfirmationForm(Gala gala)

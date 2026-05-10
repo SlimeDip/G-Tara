@@ -35,7 +35,6 @@ namespace G_Tara
         private Label lblFooterTitle;
         private Panel pnlTitleBar;
         private Button btnWindowMinimize;
-        private Button btnWindowMaximize;
         private Button btnWindowClose;
         private Label lblDialogTitle;
         private Image? _goldButtonTexture;
@@ -71,7 +70,6 @@ namespace G_Tara
             lblFooterTitle = new Label();
             pnlTitleBar = new Panel();
             btnWindowMinimize = new Button();
-            btnWindowMaximize = new Button();
             btnWindowClose = new Button();
             lblDialogTitle = new Label();
             ((ISupportInitialize)picProfile).BeginInit();

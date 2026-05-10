@@ -44,9 +44,6 @@ namespace G_Tara
         private Label lblHost;
         private ComboBox cmbHost;
         private PictureBox picCalendar;
-        private PictureBox picCheckmark;
-        private PictureBox picLocation;
-        private PictureBox picCategory;
         private PictureBox picLogo;
 
         protected override void Dispose(bool disposing)
@@ -101,9 +98,6 @@ namespace G_Tara
             btnSave = new Button();
             btnCancel = new Button();
             btnDelete = new Button();
-            picCheckmark = new PictureBox();
-            picLocation = new PictureBox();
-            picCategory = new PictureBox();
             picLogo = new PictureBox();
             container.SuspendLayout();
             scrollPanel.SuspendLayout();
@@ -117,9 +111,6 @@ namespace G_Tara
             participantsPanel.SuspendLayout();
             planPanel.SuspendLayout();
             buttonPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)picCheckmark).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picLocation).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picCategory).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
             SuspendLayout();
             // 
@@ -595,33 +586,6 @@ namespace G_Tara
             btnDelete.Text = "DELETE";
             btnDelete.UseVisualStyleBackColor = true;
             // 
-            // picCheckmark
-            // 
-            picCheckmark.Location = new Point(0, 0);
-            picCheckmark.Name = "picCheckmark";
-            picCheckmark.Size = new Size(100, 50);
-            picCheckmark.TabIndex = 0;
-            picCheckmark.TabStop = false;
-            picCheckmark.Visible = false;
-            // 
-            // picLocation
-            // 
-            picLocation.Location = new Point(0, 0);
-            picLocation.Name = "picLocation";
-            picLocation.Size = new Size(100, 50);
-            picLocation.TabIndex = 0;
-            picLocation.TabStop = false;
-            picLocation.Visible = false;
-            // 
-            // picCategory
-            // 
-            picCategory.Location = new Point(0, 0);
-            picCategory.Name = "picCategory";
-            picCategory.Size = new Size(100, 50);
-            picCategory.TabIndex = 0;
-            picCategory.TabStop = false;
-            picCategory.Visible = false;
-            // 
             // picLogo
             // 
             picLogo.Location = new Point(0, 0);
@@ -667,9 +631,6 @@ namespace G_Tara
             planPanel.ResumeLayout(false);
             planPanel.PerformLayout();
             buttonPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)picCheckmark).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picLocation).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picCategory).EndInit();
             ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
             ResumeLayout(false);
         }
