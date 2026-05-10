@@ -956,6 +956,64 @@ namespace G_Tara
             lblHost.ForeColor = text;
             BuildHostPill(participantsPanel, text);
 
+            if (participantsPanel != null)
+            {
+                participantsPanel.BackColor = card;
+                participantsPanel.Size = new Size(370, 310);
+                participantsPanel.Location = new Point(10, 10);
+                participantsPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), 14));
+            }
+            lblParticipants.Font = new Font("Segoe UI Semibold", 9F);
+            lblParticipants.ForeColor = text;
+            lblParticipants.Location = new Point(14, 12);
+
+            chkParticipants.Location = new Point(8, 36);
+            chkParticipants.Size = new Size(352, 262);
+
+            if (planPanel != null)
+            {
+                planPanel.BackColor = card;
+                planPanel.Size = new Size(370, 200);
+                planPanel.Location = new Point(10, 328);
+                planPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, planPanel.Width, planPanel.Height), 14));
+            }
+            lblPlan.Location = new Point(14, 12);
+            lblPlan.Font = new Font("Segoe UI Semibold", 9F);
+            lblPlan.ForeColor = text;
+            txtPlan.Location = new Point(14, 34);
+            txtPlan.Size = new Size(340, 148);
+            txtPlan.BackColor = Color.FromArgb(255, 246, 248);
+
+            if (_participantCardsPanel != null)
+            {
+                _participantCardsPanel.Location = chkParticipants.Location;
+                _participantCardsPanel.Size = chkParticipants.Size;
+                _participantCardsPanel.BackColor = Color.FromArgb(252, 241, 243);
+            }
+
+            buttonPanel.BackColor = deep;
+            buttonPanel.Padding = new Padding(24, 12, 0, 0);
+            buttonPanel.FlowDirection = FlowDirection.LeftToRight;
+            buttonPanel.WrapContents = false;
+
+            btnSave.Size = new Size(88, 30);
+            btnCancel.Size = new Size(88, 30);
+            btnDelete.Size = new Size(88, 30);
+            btnSave.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
+            btnCancel.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
+            btnDelete.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
+            btnDelete.ForeColor = Color.FromArgb(169, 70, 82);
+            btnSave.Margin = new Padding(4, 0, 10, 0);
+            btnCancel.Margin = new Padding(0, 0, 10, 0);
+            btnDelete.Margin = new Padding(0, 0, 0, 0);
+
+            cmbStatus.Visible = false;
+            cmbStatus.Location = new Point(-500, -500);
+            cmbCategory.Visible = false;
+            cmbCategory.Location = new Point(-500, -500);
+            cmbHost.Visible = false;
+            cmbHost.Location = new Point(-500, -500);
+
             StyleComboBox(cmbStatus);
             StyleComboBox(cmbCategory);
             StyleComboBox(cmbHost);
