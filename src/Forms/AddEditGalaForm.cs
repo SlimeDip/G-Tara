@@ -478,8 +478,9 @@ namespace G_Tara
             {
                 if (location.Latitude != 0 && location.Longitude != 0)
                 {
-                    var query = Uri.EscapeDataString($"{location.Name} near {location.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{location.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
-                    var url = $"https://www.google.com/maps/search/?api=1&query={query}";
+                    var lat = location.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    var lon = location.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    var url = $"https://www.google.com/maps/search/?api=1&query={lat},{lon}";
                     try
                     {
                         Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
