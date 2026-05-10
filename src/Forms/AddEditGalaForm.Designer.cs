@@ -147,7 +147,7 @@ namespace G_Tara
             scrollPanel.Controls.Add(mainPanel);
             scrollPanel.Dock = DockStyle.Fill;
             scrollPanel.Location = new Point(0, 0);
-            scrollPanel.Margin = new Padding(0);
+            scrollPanel.Margin = new Padding(0, 30, 0, 0);
             scrollPanel.Name = "scrollPanel";
             scrollPanel.Size = new Size(920, 576);
             scrollPanel.TabIndex = 0;
