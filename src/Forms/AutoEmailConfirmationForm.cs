@@ -53,11 +53,12 @@ namespace G_Tara
         private void CreateCustomTitleBar()
         {
             Color titleBarColor = Color.FromArgb(241, 206, 211);
+            var scale = FormUtilities.GetDpiScale(this);
             
             pnlTitleBar = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 34,
+                Height = FormUtilities.Scale(34, scale),
                 BackColor = titleBarColor
             };
             pnlTitleBar.MouseDown += OnTitleBarMouseDown;
@@ -66,7 +67,7 @@ namespace G_Tara
             {
                 Text = "Auto Email Confirmation",
                 AutoSize = true,
-                Location = new Point(12, 8),
+                Location = FormUtilities.ScalePoint(new Point(12, 8), scale),
                 Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(80, 40, 45),
                 BackColor = Color.Transparent
@@ -76,8 +77,8 @@ namespace G_Tara
             btnWindowMinimize = new Button
             {
                 Text = "♡",
-                Size = new Size(30, 28),
-                Location = new Point(this.ClientSize.Width - 102, 2),
+                Size = FormUtilities.ScaleSize(new Size(30, 28), scale),
+                Location = new Point(this.ClientSize.Width - FormUtilities.Scale(102, scale), FormUtilities.Scale(2, scale)),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Transparent,
@@ -93,8 +94,8 @@ namespace G_Tara
             btnWindowClose = new Button
             {
                 Text = "♥",
-                Size = new Size(30, 28),
-                Location = new Point(this.ClientSize.Width - 44, 2),
+                Size = FormUtilities.ScaleSize(new Size(30, 28), scale),
+                Location = new Point(this.ClientSize.Width - FormUtilities.Scale(44, scale), FormUtilities.Scale(2, scale)),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Transparent,
@@ -131,8 +132,9 @@ namespace G_Tara
         private void LayoutWindowButtons()
         {
             if (btnWindowMinimize == null || btnWindowClose == null || pnlTitleBar == null) return;
-            btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - 8, 2);
-            btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - 4, 2);
+            var scale = FormUtilities.GetDpiScale(this);
+            btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - FormUtilities.Scale(8, scale), FormUtilities.Scale(2, scale));
+            btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - FormUtilities.Scale(4, scale), FormUtilities.Scale(2, scale));
         }
 
         private void AutoEmailConfirmationForm_SizeChanged(object? sender, EventArgs e)

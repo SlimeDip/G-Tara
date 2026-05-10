@@ -48,11 +48,12 @@ namespace G_Tara
         private void CreateCustomTitleBar()
         {
             Color titleBarColor = Color.FromArgb(241, 206, 211);
+            var scale = FormUtilities.GetDpiScale(this);
 
             pnlTitleBar = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 34,
+                Height = FormUtilities.Scale(34, scale),
                 BackColor = titleBarColor
             };
             pnlTitleBar.MouseDown += OnTitleBarMouseDown;
@@ -61,7 +62,7 @@ namespace G_Tara
             {
                 Text = "ADD/EDIT GALA DETAILS",
                 AutoSize = true,
-                Location = new Point(12, 8),
+                Location = FormUtilities.ScalePoint(new Point(12, 8), scale),
                 Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(80, 40, 45),
                 BackColor = Color.Transparent
@@ -71,8 +72,8 @@ namespace G_Tara
             btnWindowMinimize = new Button
             {
                 Text = "♡",
-                Size = new Size(30, 28),
-                Location = new Point(this.ClientSize.Width - 74, 2),
+                Size = FormUtilities.ScaleSize(new Size(30, 28), scale),
+                Location = new Point(this.ClientSize.Width - FormUtilities.Scale(74, scale), FormUtilities.Scale(2, scale)),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Transparent,
@@ -88,8 +89,8 @@ namespace G_Tara
             btnWindowClose = new Button
             {
                 Text = "♥",
-                Size = new Size(30, 28),
-                Location = new Point(this.ClientSize.Width - 44, 2),
+                Size = FormUtilities.ScaleSize(new Size(30, 28), scale),
+                Location = new Point(this.ClientSize.Width - FormUtilities.Scale(44, scale), FormUtilities.Scale(2, scale)),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Transparent,
@@ -113,8 +114,9 @@ namespace G_Tara
             {
                 if (btnWindowMinimize != null && btnWindowClose != null && pnlTitleBar != null)
                 {
-                    btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - 8, 2);
-                    btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - 8, 2);
+                    var s = FormUtilities.GetDpiScale(this);
+                    btnWindowClose.Location = new Point(pnlTitleBar.Width - btnWindowClose.Width - FormUtilities.Scale(8, s), FormUtilities.Scale(2, s));
+                    btnWindowMinimize.Location = new Point(btnWindowClose.Left - btnWindowMinimize.Width - FormUtilities.Scale(8, s), FormUtilities.Scale(2, s));
                 }
             };
         }
@@ -731,9 +733,11 @@ namespace G_Tara
             Color text = Color.FromArgb(94, 49, 58);
             Color deep = Color.FromArgb(197, 125, 143);
 
+            var scale = FormUtilities.GetDpiScale(this);
+
             BackColor = bg;
             Font = new Font("Segoe UI", 8.75F, FontStyle.Regular);
-            ClientSize = new Size(920, 640);
+            ClientSize = FormUtilities.ScaleSize(new Size(920, 640), scale);
 
             Panel? leftPanel = lblName.Parent as Panel;
             Panel? participantsPanel = lblParticipants.Parent as Panel;
@@ -743,12 +747,12 @@ namespace G_Tara
             if (container != null)
             {
                 container.BackColor = bg;
-                container.RowStyles[1].Height = 64;
+                container.RowStyles[1].Height = FormUtilities.Scale(64, scale);
             }
 
             if (mainPanel != null)
             {
-                mainPanel.Padding = new Padding(14, 10, 14, 8);
+                mainPanel.Padding = new Padding(FormUtilities.Scale(14, scale), FormUtilities.Scale(10, scale), FormUtilities.Scale(14, scale), FormUtilities.Scale(8, scale));
                 mainPanel.ColumnStyles[0].Width = 54f;
                 mainPanel.ColumnStyles[1].Width = 46f;
             }
@@ -759,22 +763,22 @@ namespace G_Tara
             if (rightPanel != null)
             {
                 rightPanel.BackColor = bg;
-                rightPanel.Padding = new Padding(10, 0, 0, 0);
+                rightPanel.Padding = new Padding(FormUtilities.Scale(10, scale), 0, 0, 0);
             }
 
             if (picLogo != null) picLogo.Visible = false;
 
-            lblName.Location = new Point(12, 10);
+            lblName.Location = FormUtilities.ScalePoint(new Point(12, 10), scale);
             lblName.Font = new Font("Segoe UI Semibold", 9.2F);
             lblName.ForeColor = text;
-            txtName.Location = new Point(12, 30);
-            txtName.Size = new Size(440, 28);
+            txtName.Location = FormUtilities.ScalePoint(new Point(12, 30), scale);
+            txtName.Size = FormUtilities.ScaleSize(new Size(440, 28), scale);
             txtName.BackColor = Color.FromArgb(248, 232, 235);
 
             // EVENT DATE row — horizontal: icon | label | [rounded textbox wrapper] | pill button
             picCalendar.Visible = true;
-            picCalendar.Size = new Size(26, 26);
-            picCalendar.Location = new Point(12, 80);
+            picCalendar.Size = FormUtilities.ScaleSize(new Size(26, 26), scale);
+            picCalendar.Location = FormUtilities.ScalePoint(new Point(12, 80), scale);
             picCalendar.SizeMode = PictureBoxSizeMode.Zoom;
 
             try
@@ -785,29 +789,29 @@ namespace G_Tara
             }
             catch { }
 
-            lblDate.Location = new Point(46, 84);
+            lblDate.Location = FormUtilities.ScalePoint(new Point(46, 84), scale);
             lblDate.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblDate.ForeColor = text;
             lblDate.AutoSize = true;
 
-            datePanel.Location = new Point(140, 74);
-            datePanel.Size = new Size(300, 32);
+            datePanel.Location = FormUtilities.ScalePoint(new Point(140, 74), scale);
+            datePanel.Size = FormUtilities.ScaleSize(new Size(300, 32), scale);
             datePanel.BackColor = Color.Transparent;
 
-            txtDateRange.Location = new Point(4, 5);
-            txtDateRange.Size = new Size(158, 22);
+            txtDateRange.Location = FormUtilities.ScalePoint(new Point(4, 5), scale);
+            txtDateRange.Size = FormUtilities.ScaleSize(new Size(158, 22), scale);
             txtDateRange.BorderStyle = BorderStyle.None;
             txtDateRange.BackColor = Color.FromArgb(248, 232, 235);
             txtDateRange.TextAlign = HorizontalAlignment.Center;
 
-            btnPickRange.Location = new Point(175, 1);
-            btnPickRange.Size = new Size(124, 30);
+            btnPickRange.Location = FormUtilities.ScalePoint(new Point(175, 1), scale);
+            btnPickRange.Size = FormUtilities.ScaleSize(new Size(124, 30), scale);
 
             datePanel.Paint -= OnDatePanelPaint;
             datePanel.Paint += OnDatePanelPaint;
 
             // STATUS row — horizontal: icon | label | colored pill dropdown
-            _picStatus.Location = new Point(12, 118);
+            _picStatus.Location = FormUtilities.ScalePoint(new Point(12, 118), scale);
             _picStatus.BackColor = Color.Transparent;
             try
             {
@@ -820,19 +824,19 @@ namespace G_Tara
             if (lblName.Parent != null && !lblName.Parent.Controls.Contains(_picStatus))
                 lblName.Parent.Controls.Add(_picStatus);
 
-            lblStatus.Location = new Point(44, 123);
+            lblStatus.Location = FormUtilities.ScalePoint(new Point(44, 123), scale);
             lblStatus.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblStatus.ForeColor = text;
             lblStatus.AutoSize = true;
 
             cmbStatus.Visible = false;
             cmbStatus.Location = new Point(-500, -500);
-            cmbStatus.Size = new Size(200, 24);
+            cmbStatus.Size = FormUtilities.ScaleSize(new Size(200, 24), scale);
 
             BuildStatusPill(lblName.Parent, text);
 
             // LOCATION PIN row — horizontal: icon | label | rounded textbox | pill button
-            _picLocation.Location = new Point(12, 172);
+            _picLocation.Location = FormUtilities.ScalePoint(new Point(12, 172), scale);
             _picLocation.BackColor = Color.Transparent;
             try
             {
@@ -845,35 +849,35 @@ namespace G_Tara
             if (lblName.Parent != null && !lblName.Parent.Controls.Contains(_picLocation))
                 lblName.Parent.Controls.Add(_picLocation);
 
-            lblLocation.Location = new Point(44, 177);
+            lblLocation.Location = FormUtilities.ScalePoint(new Point(44, 177), scale);
             lblLocation.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblLocation.ForeColor = text;
             lblLocation.AutoSize = true;
 
-            locationPanel.Location = new Point(140, 166);
-            locationPanel.Size = new Size(320, 36);
+            locationPanel.Location = FormUtilities.ScalePoint(new Point(140, 166), scale);
+            locationPanel.Size = FormUtilities.ScaleSize(new Size(320, 36), scale);
             locationPanel.BackColor = Color.Transparent;
 
-            txtLocation.Location = new Point(8, 7);
-            txtLocation.Size = new Size(152, 22);
+            txtLocation.Location = FormUtilities.ScalePoint(new Point(8, 7), scale);
+            txtLocation.Size = FormUtilities.ScaleSize(new Size(152, 22), scale);
             txtLocation.BorderStyle = BorderStyle.None;
-            txtLocation.Margin = new Padding(5, 10, 0, 0);
+            txtLocation.Margin = new Padding(FormUtilities.Scale(5, scale), FormUtilities.Scale(10, scale), 0, 0);
             txtLocation.BackColor = Color.FromArgb(248, 232, 235);
             txtLocation.Font = new Font("Segoe UI", 8.75F);
 
-            btnPickMap.Location = new Point(196, 3);
-            btnPickMap.Size = new Size(110, 30);
-            btnPickMap.Margin = new Padding(13, 2, 0, 0);
+            btnPickMap.Location = FormUtilities.ScalePoint(new Point(196, 3), scale);
+            btnPickMap.Size = FormUtilities.ScaleSize(new Size(110, 30), scale);
+            btnPickMap.Margin = new Padding(FormUtilities.Scale(13, scale), FormUtilities.Scale(2, scale), 0, 0);
 
             locationPanel.Paint -= OnLocationPanelPaint;
             locationPanel.Paint += OnLocationPanelPaint;
 
             _lblCoordinates.ForeColor = Color.FromArgb(44, 128, 76);
             _lblCoordinates.Font = new Font("Segoe UI", 8.2F, FontStyle.Bold);
-            _lblCoordinates.Location = new Point(140, 206);
+            _lblCoordinates.Location = FormUtilities.ScalePoint(new Point(140, 206), scale);
 
             // CATEGORY row — horizontal: icon | label | rounded pill showing selected category
-            _picCategory.Location = new Point(12, 234);
+            _picCategory.Location = FormUtilities.ScalePoint(new Point(12, 234), scale);
             _picCategory.BackColor = Color.Transparent;
             try
             {
@@ -886,38 +890,38 @@ namespace G_Tara
             if (lblName.Parent != null && !lblName.Parent.Controls.Contains(_picCategory))
                 lblName.Parent.Controls.Add(_picCategory);
 
-            lblCategory.Location = new Point(44, 239);
+            lblCategory.Location = FormUtilities.ScalePoint(new Point(44, 239), scale);
             lblCategory.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblCategory.ForeColor = text;
             lblCategory.AutoSize = true;
 
             cmbCategory.Visible = false;
             cmbCategory.Location = new Point(-500, -500);
-            cmbCategory.Size = new Size(176, 24);
+            cmbCategory.Size = FormUtilities.ScaleSize(new Size(176, 24), scale);
 
             BuildCategoryPill(lblName.Parent, text);
 
             // SEARCH & DISCOVER LOCATIONS card
             lblSearchResults.Text = "SEARCH & DISCOVER LOCATIONS";
-            lblSearchResults.Location = new Point(12, 290);
+            lblSearchResults.Location = FormUtilities.ScalePoint(new Point(12, 290), scale);
             lblSearchResults.Font = new Font("Segoe UI Semibold", 8.5F, FontStyle.Bold);
             lblSearchResults.ForeColor = text;
 
-            btnRefreshPlaces.Location = new Point(12, 315);
-            btnRefreshPlaces.Size = new Size(140, 28);
+            btnRefreshPlaces.Location = FormUtilities.ScalePoint(new Point(12, 315), scale);
+            btnRefreshPlaces.Size = FormUtilities.ScaleSize(new Size(140, 28), scale);
             btnRefreshPlaces.Text = "Refresh Locations";
 
-            lstSearchResults.Location = new Point(12, 350);
-            lstSearchResults.Size = new Size(420, 90);
+            lstSearchResults.Location = FormUtilities.ScalePoint(new Point(12, 350), scale);
+            lstSearchResults.Size = FormUtilities.ScaleSize(new Size(420, 90), scale);
             lstSearchResults.BackColor = Color.FromArgb(255, 246, 248);
             lstSearchResults.BorderStyle = BorderStyle.FixedSingle;
 
-            lblSelected.Location = new Point(12, 450);
+            lblSelected.Location = FormUtilities.ScalePoint(new Point(12, 450), scale);
             lblSelected.Font = new Font("Segoe UI Semibold", 8.6F, FontStyle.Bold);
             lblSelected.ForeColor = text;
 
-            lstSelectedLocations.Location = new Point(12, 470);
-            lstSelectedLocations.Size = new Size(420, 80);
+            lstSelectedLocations.Location = FormUtilities.ScalePoint(new Point(12, 470), scale);
+            lstSelectedLocations.Size = FormUtilities.ScaleSize(new Size(420, 80), scale);
             lstSelectedLocations.BackColor = Color.FromArgb(255, 246, 248);
             lstSelectedLocations.BorderStyle = BorderStyle.FixedSingle;
 
@@ -927,31 +931,31 @@ namespace G_Tara
             int totalBtnsWidth = btnW * 2 + gap;
             int btnStartX = (420 - totalBtnsWidth) / 2 + 12;
 
-            btnAdd.Location = new Point(btnStartX, btnY);
-            btnAdd.Size = new Size(btnW, 28);
+            btnAdd.Location = FormUtilities.ScalePoint(new Point(btnStartX, btnY), scale);
+            btnAdd.Size = FormUtilities.ScaleSize(new Size(btnW, 28), scale);
             btnAdd.Text = "Add Location";
 
-            btnRemove.Location = new Point(btnStartX + btnW + gap, btnY);
-            btnRemove.Size = new Size(btnW, 28);
+            btnRemove.Location = FormUtilities.ScalePoint(new Point(btnStartX + btnW + gap, btnY), scale);
+            btnRemove.Size = FormUtilities.ScaleSize(new Size(btnW, 28), scale);
             btnRemove.Text = "Remove Location";
 
-            lblWeatherTitle.Location = new Point(12, 600);
+            lblWeatherTitle.Location = FormUtilities.ScalePoint(new Point(12, 600), scale);
             lblWeatherTitle.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
             lblWeatherTitle.ForeColor = text;
 
-            weatherPanel.Location = new Point(12, 620);
-            weatherPanel.Size = new Size(430, 34);
+            weatherPanel.Location = FormUtilities.ScalePoint(new Point(12, 620), scale);
+            weatherPanel.Size = FormUtilities.ScaleSize(new Size(430, 34), scale);
             weatherPanel.WrapContents = false;
 
-            btnGetWeather.Size = new Size(120, 28);
-            btnGetWeather.Margin = new Padding(0, 3, 8, 0);
+            btnGetWeather.Size = FormUtilities.ScaleSize(new Size(120, 28), scale);
+            btnGetWeather.Margin = new Padding(0, FormUtilities.Scale(3, scale), FormUtilities.Scale(8, scale), 0);
 
             lblWeather.Font = new Font("Segoe UI", 8.2F);
             lblWeather.ForeColor = text;
             lblWeather.AutoSize = true;
-            lblWeather.Margin = new Padding(0, 8, 0, 0);
+            lblWeather.Margin = new Padding(0, FormUtilities.Scale(8, scale), 0, 0);
 
-            lblHost.Location = new Point(130, 12);
+            lblHost.Location = FormUtilities.ScalePoint(new Point(130, 12), scale);
             lblHost.Font = new Font("Segoe UI Semibold", 8.9F);
             lblHost.ForeColor = text;
             BuildHostPill(participantsPanel, text);
@@ -959,29 +963,29 @@ namespace G_Tara
             if (participantsPanel != null)
             {
                 participantsPanel.BackColor = card;
-                participantsPanel.Size = new Size(370, 310);
-                participantsPanel.Location = new Point(10, 10);
-                participantsPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), 14));
+                participantsPanel.Size = FormUtilities.ScaleSize(new Size(370, 310), scale);
+                participantsPanel.Location = FormUtilities.ScalePoint(new Point(10, 10), scale);
+                participantsPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), FormUtilities.Scale(14, scale)));
             }
             lblParticipants.Font = new Font("Segoe UI Semibold", 9F);
             lblParticipants.ForeColor = text;
-            lblParticipants.Location = new Point(14, 12);
+            lblParticipants.Location = FormUtilities.ScalePoint(new Point(14, 12), scale);
 
-            chkParticipants.Location = new Point(8, 36);
-            chkParticipants.Size = new Size(352, 262);
+            chkParticipants.Location = FormUtilities.ScalePoint(new Point(8, 36), scale);
+            chkParticipants.Size = FormUtilities.ScaleSize(new Size(352, 262), scale);
 
             if (planPanel != null)
             {
                 planPanel.BackColor = card;
-                planPanel.Size = new Size(370, 200);
-                planPanel.Location = new Point(10, 328);
-                planPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, planPanel.Width, planPanel.Height), 14));
+                planPanel.Size = FormUtilities.ScaleSize(new Size(370, 200), scale);
+                planPanel.Location = FormUtilities.ScalePoint(new Point(10, 328), scale);
+                planPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, planPanel.Width, planPanel.Height), FormUtilities.Scale(14, scale)));
             }
-            lblPlan.Location = new Point(14, 12);
+            lblPlan.Location = FormUtilities.ScalePoint(new Point(14, 12), scale);
             lblPlan.Font = new Font("Segoe UI Semibold", 9F);
             lblPlan.ForeColor = text;
-            txtPlan.Location = new Point(14, 34);
-            txtPlan.Size = new Size(340, 148);
+            txtPlan.Location = FormUtilities.ScalePoint(new Point(14, 34), scale);
+            txtPlan.Size = FormUtilities.ScaleSize(new Size(340, 148), scale);
             txtPlan.BackColor = Color.FromArgb(255, 246, 248);
 
             if (_participantCardsPanel != null)
@@ -992,19 +996,19 @@ namespace G_Tara
             }
 
             buttonPanel.BackColor = deep;
-            buttonPanel.Padding = new Padding(24, 12, 0, 0);
+            buttonPanel.Padding = new Padding(FormUtilities.Scale(24, scale), FormUtilities.Scale(12, scale), 0, 0);
             buttonPanel.FlowDirection = FlowDirection.LeftToRight;
             buttonPanel.WrapContents = false;
 
-            btnSave.Size = new Size(88, 30);
-            btnCancel.Size = new Size(88, 30);
-            btnDelete.Size = new Size(88, 30);
+            btnSave.Size = FormUtilities.ScaleSize(new Size(88, 30), scale);
+            btnCancel.Size = FormUtilities.ScaleSize(new Size(88, 30), scale);
+            btnDelete.Size = FormUtilities.ScaleSize(new Size(88, 30), scale);
             btnSave.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
             btnCancel.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
             btnDelete.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
             btnDelete.ForeColor = Color.FromArgb(169, 70, 82);
-            btnSave.Margin = new Padding(4, 0, 10, 0);
-            btnCancel.Margin = new Padding(0, 0, 10, 0);
+            btnSave.Margin = new Padding(FormUtilities.Scale(4, scale), 0, FormUtilities.Scale(10, scale), 0);
+            btnCancel.Margin = new Padding(0, 0, FormUtilities.Scale(10, scale), 0);
             btnDelete.Margin = new Padding(0, 0, 0, 0);
 
             cmbStatus.Visible = false;

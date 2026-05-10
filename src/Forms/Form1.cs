@@ -118,37 +118,43 @@ namespace G_Tara
                 return;
             }
 
+            var scale = FormUtilities.GetDpiScale(this);
+
             if (picMiniLogo != null)
             {
-                picMiniLogo.Location = new Point(12, (titleBar.Height - picMiniLogo.Height) / 2);
+                picMiniLogo.Size = FormUtilities.ScaleSize(new Size(24, 24), scale);
+                picMiniLogo.Location = new Point(FormUtilities.Scale(12, scale), (titleBar.Height - picMiniLogo.Height) / 2);
             }
 
             if (lblTitle != null && picMiniLogo != null)
             {
-                lblTitle.Location = new Point(picMiniLogo.Right + 8, (titleBar.Height - lblTitle.Height) / 2);
+                lblTitle.Location = new Point(picMiniLogo.Right + FormUtilities.Scale(8, scale), (titleBar.Height - lblTitle.Height) / 2);
             }
 
             if (btnWindowMinimize != null && btnWindowClose != null)
             {
                 if (windowButtonsPanel != null)
                 {
-                    var top = Math.Max(0, (titleBar.Height - 32) / 2);
-                    windowButtonsPanel.Padding = new Padding(0, top, 8, 0);
+                    var top = Math.Max(0, (titleBar.Height - FormUtilities.Scale(32, scale)) / 2);
+                    windowButtonsPanel.Padding = new Padding(0, top, FormUtilities.Scale(8, scale), 0);
                 }
 
-                btnWindowMinimize.Margin = new Padding(0, 0, 6, 0);
+                btnWindowMinimize.Size = FormUtilities.ScaleSize(new Size(32, 32), scale);
+                btnWindowClose.Size = FormUtilities.ScaleSize(new Size(32, 32), scale);
+
+                btnWindowMinimize.Margin = new Padding(0, 0, FormUtilities.Scale(6, scale), 0);
                 btnWindowClose.Margin = new Padding(0);
             }
         }
 
         private void ApplyToolbarStyling()
         {
-            var scale = DeviceDpi / 96f;
+            var scale = FormUtilities.GetDpiScale(this);
 
             if (mainPanel.RowStyles.Count > 0)
             {
                 mainPanel.RowStyles[0].SizeType = SizeType.Absolute;
-                mainPanel.RowStyles[0].Height = (int)Math.Round(140 * scale);
+                mainPanel.RowStyles[0].Height = FormUtilities.Scale(140, scale);
             }
 
             if (toolbarContainer != null)
