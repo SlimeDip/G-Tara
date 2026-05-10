@@ -120,9 +120,7 @@ namespace G_Tara
             pnlTitleBar.Controls.Add(lblWindowTitle);
             pnlTitleBar.Controls.Add(btnWindowMinimize);
             pnlTitleBar.Controls.Add(btnWindowClose);
-            this.Controls.Add(pnlTitleBar);
 
-            pnlTitleBar.BringToFront();
             LayoutWindowButtons();
 
             Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 96, BackColor = Color.Transparent };
@@ -223,13 +221,15 @@ namespace G_Tara
             ApplyPillButtonStyle(btnFooterRemove, galaWhite, darkPinkText);
             ApplyPillButtonStyle(btnFooterClose, galaWhite, darkPinkText);
 
-            this.Controls.Add(cardContainer);
-            this.Controls.Add(topPanel);
-            this.Controls.Add(bottomPanel);
-            
-            // Add Title Bar LAST so it stays at the very top (outermost Dock.Top)
-            this.Controls.Add(pnlTitleBar);
-            pnlTitleBar.BringToFront();
+            // --- FINAL ASSEMBLY ---
+            // In WinForms, for controls with the same Dock style, 
+            // the control added LAST (or SendToBack) sits closest to the edge.
+            this.Controls.Add(cardContainer); // Index 0: Fills remaining space
+            this.Controls.Add(bottomPanel);   // Index 1: Bottom edge
+            this.Controls.Add(topPanel);      // Index 2: Top (below title bar)
+            this.Controls.Add(pnlTitleBar);   // Index 3: Absolute Top Edge
+
+            LayoutWindowButtons();
 
             ApplyGaraTheme();
             this.Load += ParticipantsManagementForm_Load;
