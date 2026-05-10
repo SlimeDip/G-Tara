@@ -358,7 +358,7 @@ namespace G_Tara
             // 
             btnRefreshPlaces.Location = new Point(8, 110);
             btnRefreshPlaces.Name = "btnRefreshPlaces";
-            btnRefreshPlaces.Size = new Size(130, 28);
+            btnRefreshPlaces.Size = new Size(230, 28);
             btnRefreshPlaces.TabIndex = 2;
             btnRefreshPlaces.Text = "Refresh Locations";
             btnRefreshPlaces.UseVisualStyleBackColor = true;

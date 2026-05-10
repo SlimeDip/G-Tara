@@ -841,6 +841,7 @@ namespace G_Tara
             txtLocation.Location = new Point(8, 7);
             txtLocation.Size = new Size(152, 22);
             txtLocation.BorderStyle = BorderStyle.None;
+            txtLocation.Margin = new Padding(5, 10, 0, 0);
             txtLocation.BackColor = Color.FromArgb(248, 232, 235);
             txtLocation.Font = new Font("Segoe UI", 8.75F);
 
