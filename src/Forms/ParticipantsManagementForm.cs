@@ -129,7 +129,7 @@ namespace G_Tara
             Panel bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 100, BackColor = galaDeepPink, Padding = new Padding(0, 18, 0, 18) };
 
             // Use a TableLayoutPanel to perfectly center the search container
-            TableLayoutPanel centerTable = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1 };
+            TableLayoutPanel centerTable = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1 };
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500f)); // Search box width
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));

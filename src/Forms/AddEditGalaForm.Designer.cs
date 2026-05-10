@@ -476,7 +476,6 @@ namespace G_Tara
             // participantsPanel
             // 
             participantsPanel.BackColor = Color.FromArgb(249, 230, 235);
-            participantsPanel.BorderStyle = BorderStyle.FixedSingle;
             participantsPanel.Controls.Add(lblParticipants);
             participantsPanel.Controls.Add(lblHost);
             participantsPanel.Controls.Add(cmbHost);
@@ -508,7 +507,6 @@ namespace G_Tara
             // planPanel
             // 
             planPanel.BackColor = Color.FromArgb(249, 230, 235);
-            planPanel.BorderStyle = BorderStyle.FixedSingle;
             planPanel.Controls.Add(lblPlan);
             planPanel.Controls.Add(txtPlan);
             planPanel.Location = new Point(10, 364);
