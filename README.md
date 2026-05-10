@@ -1,4 +1,6 @@
 <div align="center">
+	
+<img src="src/Assets/G-tara Logo.png" alt="G-Tara Logo" width="300"/>
 
 <h1 align="center">G-Tara — Gala Planning Assistant</h1>
 G-Tara is a Windows Forms application for planning and coordinating galas. Hosts can schedule events, manage participants and availability, select locations, and share plans with attendees.
