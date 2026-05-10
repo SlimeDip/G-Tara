@@ -49,7 +49,7 @@ namespace G_Tara
             // lblParticipants
             //
             this.lblParticipants.AutoSize = true;
-            this.lblParticipants.Location = new System.Drawing.Point(12, 49);
+            this.lblParticipants.Location = new System.Drawing.Point(12, 44);
             this.lblParticipants.Name = "lblParticipants";
             this.lblParticipants.Size = new System.Drawing.Size(120, 15);
             this.lblParticipants.Text = "Participants' Gmails:";
@@ -58,18 +58,18 @@ namespace G_Tara
             //
             this.txtParticipants.BackColor = galaWhite;
             this.txtParticipants.BorderStyle = BorderStyle.FixedSingle;
-            this.txtParticipants.Location = new System.Drawing.Point(12, 69);
+            this.txtParticipants.Location = new System.Drawing.Point(12, 64);
             this.txtParticipants.Multiline = true;
             this.txtParticipants.Name = "txtParticipants";
             this.txtParticipants.ReadOnly = true;
             this.txtParticipants.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtParticipants.Size = new System.Drawing.Size(360, 80);
+            this.txtParticipants.Size = new System.Drawing.Size(360, 60);
             this.txtParticipants.TabIndex = 1;
             // 
             // lblHostEmail
             // 
             this.lblHostEmail.AutoSize = true;
-            this.lblHostEmail.Location = new System.Drawing.Point(12, 115);
+            this.lblHostEmail.Location = new System.Drawing.Point(12, 134);
             this.lblHostEmail.Name = "lblHostEmail";
             this.lblHostEmail.Size = new System.Drawing.Size(73, 15);
             this.lblHostEmail.TabIndex = 2;
@@ -77,16 +77,18 @@ namespace G_Tara
             // 
             // txtHostEmail
             // 
-            this.txtHostEmail.Location = new System.Drawing.Point(12, 133);
+            this.txtHostEmail.BackColor = galaWhite;
+            this.txtHostEmail.BorderStyle = BorderStyle.FixedSingle;
+            this.txtHostEmail.Location = new System.Drawing.Point(12, 154);
             this.txtHostEmail.Name = "txtHostEmail";
             this.txtHostEmail.ReadOnly = true;
             this.txtHostEmail.Size = new System.Drawing.Size(360, 23);
             this.txtHostEmail.TabIndex = 3;
             // 
             // lblPlanDetails
-            //
+            // 
             this.lblPlanDetails.AutoSize = true;
-            this.lblPlanDetails.Location = new System.Drawing.Point(12, 164);
+            this.lblPlanDetails.Location = new System.Drawing.Point(12, 187);
             this.lblPlanDetails.Name = "lblPlanDetails";
             this.lblPlanDetails.Size = new System.Drawing.Size(71, 15);
             this.lblPlanDetails.Text = "Plan Details:";
@@ -95,16 +97,16 @@ namespace G_Tara
             //
             this.txtPlanDetails.BackColor = galaWhite;
             this.txtPlanDetails.BorderStyle = BorderStyle.FixedSingle;
-            this.txtPlanDetails.Location = new System.Drawing.Point(12, 184);
+            this.txtPlanDetails.Location = new System.Drawing.Point(12, 207);
             this.txtPlanDetails.Multiline = true;
             this.txtPlanDetails.Name = "txtPlanDetails";
             this.txtPlanDetails.ReadOnly = true;
             this.txtPlanDetails.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtPlanDetails.Size = new System.Drawing.Size(360, 80);
+            this.txtPlanDetails.Size = new System.Drawing.Size(360, 100);
             //
             // btnConfirm
             //
-            this.btnConfirm.Location = new System.Drawing.Point(230, 284);
+            this.btnConfirm.Location = new System.Drawing.Point(212, 320);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(80, 30);
             this.btnConfirm.Text = "Confirm";
@@ -112,7 +114,7 @@ namespace G_Tara
             //
             // btnCancel
             //
-            this.btnCancel.Location = new System.Drawing.Point(315, 284);
+            this.btnCancel.Location = new System.Drawing.Point(297, 320);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(80, 30);
             this.btnCancel.Text = "Cancel";
@@ -120,7 +122,8 @@ namespace G_Tara
             //
             // AutoEmailConfirmationForm
             //
-            this.ClientSize = new System.Drawing.Size(420, 340);
+            this.ClientSize = new System.Drawing.Size(400, 370);
+
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.txtPlanDetails);

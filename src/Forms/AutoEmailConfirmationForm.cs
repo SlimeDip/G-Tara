@@ -25,8 +25,24 @@ namespace G_Tara
         public AutoEmailConfirmationForm(Gala gala)
         {
             InitializeComponent();
-            txtPlanDetails.Text = gala.Plan;
-            txtParticipants.Text = string.Join("\r\n", gala.Participants.Select(p => p.Email));
+            
+            // Format Plan Details professionally
+            var sb = new StringBuilder();
+            sb.AppendLine($"Event: {gala.Name}");
+            sb.AppendLine($"Date: {gala.ScheduledDate:MMMM dd, yyyy}");
+            sb.AppendLine($"Location: {gala.Location}");
+            sb.AppendLine();
+            sb.AppendLine("Plan Details:");
+            sb.AppendLine(gala.Plan);
+            sb.AppendLine();
+            sb.AppendLine("See you there!");
+            
+            txtPlanDetails.Text = sb.ToString();
+            txtParticipants.Text = string.Join(", ", gala.Participants.Select(p => p.Email));
+
+            // Find Host Email
+            var host = gala.Participants.FirstOrDefault(p => p.Name == gala.HostName);
+            txtHostEmail.Text = host?.Email ?? "N/A";
 
             CreateCustomTitleBar();
             ApplyRoundedFormRegion();
