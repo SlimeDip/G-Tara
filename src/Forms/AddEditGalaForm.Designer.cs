@@ -328,7 +328,7 @@ namespace G_Tara
             // 
             cmbCategory.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCategory.FormattingEnabled = true;
-            cmbCategory.Items.AddRange(new object[] { "Hotel", "Resort", "Cafe", "Restaurant", "Bar" });
+            cmbCategory.Items.AddRange(new object[] { "Hotel", "Cafe", "Restaurant", "Bar" });
             cmbCategory.Location = new Point(12, 284);
             cmbCategory.Name = "cmbCategory";
             cmbCategory.Size = new Size(176, 23);
