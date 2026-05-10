@@ -629,6 +629,9 @@ namespace G_Tara
 
         private Control CreateParticipantCard(Participant participant, bool isSelected)
         {
+            bool isAvailable = participant.IsAvailableOn(_selectedDate);
+            Color darkOrange = Color.DarkOrange;
+
             var card = new Panel
             {
                 Size = new Size(82, 122),
@@ -641,8 +644,8 @@ namespace G_Tara
             {
                 Size = new Size(52, 52),
                 Location = new Point(15, 4),
-                BorderColorStart = Color.FromArgb(214, 147, 156),
-                BorderColorEnd = Color.FromArgb(255, 220, 226),
+                BorderColorStart = !isAvailable ? darkOrange : Color.FromArgb(214, 147, 156),
+                BorderColorEnd = !isAvailable ? Color.Orange : Color.FromArgb(255, 220, 226),
                 Image = !string.IsNullOrWhiteSpace(participant.ImagePath) && File.Exists(participant.ImagePath)
                     ? Image.FromFile(participant.ImagePath)
                     : null
@@ -661,12 +664,12 @@ namespace G_Tara
 
             var statusLabel = new Label
             {
-                Text = isSelected ? "Confirmed" : "Pending",
+                Text = !isAvailable ? "Unavailable" : (isSelected ? "Confirmed" : "Pending"),
                 Location = new Point(15, 92),
                 Size = new Size(60, 16),
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 6.7F, FontStyle.Bold),
-                ForeColor = isSelected ? Color.FromArgb(54, 120, 70) : Color.FromArgb(165, 110, 55),
+                ForeColor = !isAvailable ? darkOrange : (isSelected ? Color.FromArgb(54, 120, 70) : Color.FromArgb(165, 110, 55)),
                 BackColor = Color.Transparent
             };
 
@@ -674,7 +677,7 @@ namespace G_Tara
             {
                 Size = new Size(8, 8),
                 Location = new Point(7, 96),
-                BackColor = isSelected ? Color.FromArgb(74, 164, 95) : Color.FromArgb(224, 158, 87)
+                BackColor = !isAvailable ? darkOrange : (isSelected ? Color.FromArgb(74, 164, 95) : Color.FromArgb(224, 158, 87))
             };
             statusDot.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, statusDot.Width, statusDot.Height), 4));
 
@@ -709,7 +712,11 @@ namespace G_Tara
                 using var path = FormUtilities.CreateRoundedRectPath(borderRect, 14);
                 using var fillBrush = new SolidBrush(Color.FromArgb(255, 248, 249));
                 e.Graphics.FillPath(fillBrush, path);
-                using var pen = new Pen(isSelected ? Color.FromArgb(104, 179, 123) : Color.FromArgb(214, 188, 191), isSelected ? 1.8f : 1.2f);
+                
+                Color borderColor = !isAvailable ? darkOrange : (isSelected ? Color.FromArgb(104, 179, 123) : Color.FromArgb(214, 188, 191));
+                float borderWidth = !isAvailable ? 1.5f : (isSelected ? 1.8f : 1.2f);
+                
+                using var pen = new Pen(borderColor, borderWidth);
                 e.Graphics.DrawPath(pen, path);
             };
 
