@@ -20,7 +20,6 @@ namespace G_Tara.Services
                 var tagMapping = new Dictionary<string, (string Key, string Value)>
                 {
                     { "Hotel", ("tourism", "hotel") },
-                    { "Resort", ("tourism", "resort") },
                     { "Cafe", ("amenity", "cafe") },
                     { "Restaurant", ("amenity", "restaurant|cafe|fast_food|bar|pub") },
                     { "Bar", ("amenity", "bar|pub") }
