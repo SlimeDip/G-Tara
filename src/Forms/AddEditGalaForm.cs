@@ -1179,6 +1179,8 @@ namespace G_Tara
             cmbCategory.SelectedIndexChanged += (s, e) =>
             {
                 _categoryPill?.Invalidate();
+                cmbCategory.Visible = false;
+                cmbCategory.Location = new Point(-500, -500);
             };
 
             parent.Controls.Add(_categoryPill);
@@ -1272,6 +1274,8 @@ namespace G_Tara
             cmbStatus.SelectedIndexChanged += (s, e) =>
             {
                 _statusPill?.Invalidate();
+                cmbStatus.Visible = false;
+                cmbStatus.Location = new Point(-500, -500);
             };
 
             parent.Controls.Add(_statusPill);
@@ -1581,7 +1585,12 @@ namespace G_Tara
             };
 
             cmbHost.Leave += (s, e) => { cmbHost.Visible = false; cmbHost.Location = new Point(-500, -500); };
-            cmbHost.SelectedIndexChanged += (s, e) => _hostPill?.Invalidate();
+            cmbHost.SelectedIndexChanged += (s, e) =>
+            {
+                _hostPill?.Invalidate();
+                cmbHost.Visible = false;
+                cmbHost.Location = new Point(-500, -500);
+            };
             parent.Controls.Add(_hostPill);
             cmbHost.Visible = false;
         }
