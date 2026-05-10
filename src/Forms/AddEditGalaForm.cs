@@ -609,6 +609,18 @@ namespace G_Tara
             _participantCardsPanel.SuspendLayout();
             _participantCardsPanel.Controls.Clear();
 
+            // Calculate padding to center the cards
+            int cardWidth = 82 + 12; // Card width (82) + Margin (6 on each side)
+            int availableWidth = _participantCardsPanel.Width - _participantCardsPanel.Padding.Horizontal;
+            if (availableWidth > 0 && participants.Count > 0)
+            {
+                int cardsPerRow = Math.Max(1, availableWidth / cardWidth);
+                int actualCardsInRow = Math.Min(participants.Count, cardsPerRow);
+                int rowWidth = actualCardsInRow * cardWidth;
+                int leftPadding = (_participantCardsPanel.Width - rowWidth) / 2;
+                _participantCardsPanel.Padding = new Padding(Math.Max(6, leftPadding), 6, 6, 6);
+            }
+
             foreach (var participant in participants)
             {
                 bool isSelected = _selectedParticipants.Any(sp => sp.Id == participant.Id);
@@ -653,7 +665,7 @@ namespace G_Tara
             var statusLabel = new Label
             {
                 Text = isSelected ? "Confirmed" : "Pending",
-                Location = new Point(13, 92),
+                Location = new Point(15, 92),
                 Size = new Size(60, 16),
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 6.7F, FontStyle.Bold),
@@ -664,7 +676,7 @@ namespace G_Tara
             var statusDot = new Panel
             {
                 Size = new Size(8, 8),
-                Location = new Point(5, 96),
+                Location = new Point(7, 96),
                 BackColor = isSelected ? Color.FromArgb(74, 164, 95) : Color.FromArgb(224, 158, 87)
             };
             statusDot.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, statusDot.Width, statusDot.Height), 4));
@@ -1516,7 +1528,7 @@ namespace G_Tara
                 base.OnPaint(e);
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                Rectangle rect = new Rectangle(2, 2, Width - 5, Height - 5);
+                Rectangle rect = new Rectangle(2, 2, Width - 4, Height - 4);
                 using var circlePath = new GraphicsPath();
                 circlePath.AddEllipse(rect);
                 e.Graphics.FillEllipse(Brushes.White, rect);
