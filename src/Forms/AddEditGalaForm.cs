@@ -954,59 +954,11 @@ namespace G_Tara
             lblHost.Location = new Point(130, 12);
             lblHost.Font = new Font("Segoe UI Semibold", 8.9F);
             lblHost.ForeColor = text;
-            cmbHost.Location = new Point(195, 9);
-            cmbHost.Size = new Size(160, 23);
+            BuildHostPill(participantsPanel, text);
 
-            if (participantsPanel != null)
-            {
-                participantsPanel.BackColor = card;
-                participantsPanel.Size = new Size(370, 310);
-                participantsPanel.Location = new Point(10, 10);
-                participantsPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, participantsPanel.Width, participantsPanel.Height), 14));
-            }
-            lblParticipants.Font = new Font("Segoe UI Semibold", 9F);
-            lblParticipants.ForeColor = text;
-            lblParticipants.Location = new Point(14, 12);
-
-            chkParticipants.Location = new Point(8, 36);
-            chkParticipants.Size = new Size(352, 262);
-
-            if (planPanel != null)
-            {
-                planPanel.BackColor = card;
-                planPanel.Size = new Size(370, 200);
-                planPanel.Location = new Point(10, 328);
-                planPanel.Region = new Region(FormUtilities.CreateRoundedRectPath(new Rectangle(0, 0, planPanel.Width, planPanel.Height), 14));
-            }
-            lblPlan.Location = new Point(14, 12);
-            lblPlan.Font = new Font("Segoe UI Semibold", 9F);
-            lblPlan.ForeColor = text;
-            txtPlan.Location = new Point(14, 34);
-            txtPlan.Size = new Size(340, 148);
-            txtPlan.BackColor = Color.FromArgb(255, 246, 248);
-
-            if (_participantCardsPanel != null)
-            {
-                _participantCardsPanel.Location = chkParticipants.Location;
-                _participantCardsPanel.Size = chkParticipants.Size;
-                _participantCardsPanel.BackColor = Color.FromArgb(252, 241, 243);
-            }
-
-            buttonPanel.BackColor = deep;
-            buttonPanel.Padding = new Padding(24, 12, 0, 0);
-            buttonPanel.FlowDirection = FlowDirection.LeftToRight;
-            buttonPanel.WrapContents = false;
-
-            btnSave.Size = new Size(88, 30);
-            btnCancel.Size = new Size(88, 30);
-            btnDelete.Size = new Size(88, 30);
-            btnSave.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
-            btnCancel.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
-            btnDelete.Font = new Font("Segoe UI Semibold", 8.8F, FontStyle.Bold);
-            btnDelete.ForeColor = Color.FromArgb(169, 70, 82);
-            btnSave.Margin = new Padding(4, 0, 10, 0);
-            btnCancel.Margin = new Padding(0, 0, 10, 0);
-            btnDelete.Margin = new Padding(0, 0, 0, 0);
+            StyleComboBox(cmbStatus);
+            StyleComboBox(cmbCategory);
+            StyleComboBox(cmbHost);
         }
 
         private void OnDatePanelPaint(object? sender, PaintEventArgs e)
@@ -1210,8 +1162,8 @@ namespace G_Tara
             _categoryPill.Click += (s, e) =>
             {
                 cmbCategory.Parent?.Controls.SetChildIndex(cmbCategory, 0);
-                cmbCategory.Location = new Point(_categoryPill.Location.X, _categoryPill.Bottom + 2);
-                cmbCategory.Size = new Size(_categoryPill.Width, 24);
+                cmbCategory.Location = _categoryPill.Location;
+                cmbCategory.Size = _categoryPill.Size;
                 cmbCategory.Visible = true;
                 cmbCategory.BringToFront();
                 cmbCategory.DroppedDown = true;
@@ -1303,8 +1255,8 @@ namespace G_Tara
             _statusPill.Click += (s, e) =>
             {
                 cmbStatus.Parent?.Controls.SetChildIndex(cmbStatus, 0);
-                cmbStatus.Location = new Point(_statusPill.Location.X, _statusPill.Bottom + 2);
-                cmbStatus.Size = new Size(_statusPill.Width, 24);
+                cmbStatus.Location = _statusPill.Location;
+                cmbStatus.Size = _statusPill.Size;
                 cmbStatus.Visible = true;
                 cmbStatus.BringToFront();
                 cmbStatus.DroppedDown = true;
@@ -1544,6 +1496,94 @@ namespace G_Tara
                 using var ringPen = new Pen(ringBrush, 2.2f);
                 e.Graphics.DrawEllipse(ringPen, rect);
             }
+        }
+
+        private void StyleComboBox(ComboBox cb)
+        {
+            cb.DrawMode = DrawMode.OwnerDrawFixed;
+            cb.DropDownStyle = ComboBoxStyle.DropDownList;
+            cb.BackColor = Color.FromArgb(255, 246, 248);
+            cb.ForeColor = Color.FromArgb(94, 49, 58);
+            cb.Font = new Font("Segoe UI", 9F);
+            cb.DrawItem -= OnComboBoxDrawItem;
+            cb.DrawItem += OnComboBoxDrawItem;
+        }
+
+        private void OnComboBoxDrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var cb = sender as ComboBox;
+            if (cb == null) return;
+
+            e.DrawBackground();
+            bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+
+            using (var brush = new SolidBrush(isSelected ? Color.FromArgb(214, 147, 156) : cb.BackColor))
+            {
+                e.Graphics.FillRectangle(brush, e.Bounds);
+            }
+
+            using (var textBrush = new SolidBrush(isSelected ? Color.White : cb.ForeColor))
+            {
+                string text = cb.GetItemText(cb.Items[e.Index]);
+                e.Graphics.DrawString(text, e.Font ?? cb.Font, textBrush, e.Bounds.X + 5, e.Bounds.Y + 2);
+            }
+
+            if ((e.State & DrawItemState.Focus) == DrawItemState.Focus)
+                e.DrawFocusRectangle();
+        }
+
+        private Panel? _hostPill;
+        private void BuildHostPill(Control? parent, Color textColor)
+        {
+            if (parent == null) return;
+            if (_hostPill != null) { parent.Controls.Remove(_hostPill); _hostPill.Dispose(); }
+
+            _hostPill = new Panel
+            {
+                Location = new Point(195, 6),
+                Size = new Size(160, 30),
+                BackColor = Color.Transparent,
+                Cursor = Cursors.Hand
+            };
+
+            _hostPill.Paint += (s, e) =>
+            {
+                var g = e.Graphics;
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                var rect = new Rectangle(0, 0, _hostPill.Width - 1, _hostPill.Height - 1);
+                using var path = FormUtilities.CreateRoundedRectPath(rect, _hostPill.Height / 2);
+                using var bgBrush = new SolidBrush(Color.FromArgb(248, 232, 235));
+                g.FillPath(bgBrush, path);
+                using var borderPen = new Pen(Color.FromArgb(214, 147, 156), 1.2f);
+                g.DrawPath(borderPen, path);
+
+                string selectedText = (cmbHost.SelectedItem as Participant)?.Name ?? "Select Host";
+                var textRect = new Rectangle(12, 0, _hostPill.Width - 30, _hostPill.Height);
+                TextRenderer.DrawText(g, selectedText, new Font("Segoe UI", 8.5F), textRect, textColor,
+                    TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
+
+                int cx = _hostPill.Width - 14;
+                int cy = _hostPill.Height / 2;
+                using var chevPen = new Pen(textColor, 1.5f);
+                g.DrawLine(chevPen, cx - 4, cy - 2, cx, cy + 2);
+                g.DrawLine(chevPen, cx, cy + 2, cx + 4, cy - 2);
+            };
+
+            _hostPill.Click += (s, e) =>
+            {
+                cmbHost.Location = _hostPill.Location;
+                cmbHost.Size = _hostPill.Size;
+                cmbHost.Visible = true;
+                cmbHost.BringToFront();
+                cmbHost.DroppedDown = true;
+                cmbHost.Focus();
+            };
+
+            cmbHost.Leave += (s, e) => { cmbHost.Visible = false; cmbHost.Location = new Point(-500, -500); };
+            cmbHost.SelectedIndexChanged += (s, e) => _hostPill?.Invalidate();
+            parent.Controls.Add(_hostPill);
+            cmbHost.Visible = false;
         }
     }
 }
