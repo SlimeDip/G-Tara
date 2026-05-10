@@ -783,7 +783,7 @@ namespace G_Tara
             txtDateRange.BackColor = Color.FromArgb(248, 232, 235);
             txtDateRange.TextAlign = HorizontalAlignment.Center;
 
-            btnPickRange.Location = new Point(170, 1);
+            btnPickRange.Location = new Point(175, 1);
             btnPickRange.Size = new Size(124, 30);
 
             datePanel.Paint -= OnDatePanelPaint;
@@ -847,6 +847,7 @@ namespace G_Tara
 
             btnPickMap.Location = new Point(196, 3);
             btnPickMap.Size = new Size(110, 30);
+            btnPickMap.Margin = new Padding(13, 2, 0, 0);
 
             locationPanel.Paint -= OnLocationPanelPaint;
             locationPanel.Paint += OnLocationPanelPaint;
