@@ -219,7 +219,6 @@ namespace G_Tara
         }
         private void ApplyGaraTheme()
         {
-            // Palette for buttons[cite: 2]
             Color btnBack = Color.FromArgb(248, 230, 231);
             Color btnBorder = Color.FromArgb(210, 170, 175);
             Color btnHover = Color.FromArgb(235, 190, 195);
