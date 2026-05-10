@@ -142,7 +142,6 @@ namespace G_Tara
         {
             if (e.Button != MouseButtons.Left) return;
             ReleaseCapture();
-            // WM_NCLBUTTONDOWN = 0xA1, HTCAPTION = 2; cast to match the IntPtr DllImport signature.
             SendMessage(this.Handle, WM_NCLBUTTONDOWN, (IntPtr)HTCAPTION, IntPtr.Zero);
         }
 
@@ -162,7 +161,6 @@ namespace G_Tara
             }
             catch { }
 
-            // BUG FIX: replaced null-then-reassign pattern with a proper local function.
             void ApplyToAll(Control.ControlCollection controls)
             {
                 foreach (Control c in controls)
@@ -609,8 +607,7 @@ namespace G_Tara
             _participantCardsPanel.SuspendLayout();
             _participantCardsPanel.Controls.Clear();
 
-            // Calculate padding to center the cards
-            int cardWidth = 82 + 12; // Card width (82) + Margin (6 on each side)
+            int cardWidth = 82 + 12;
             int availableWidth = _participantCardsPanel.Width - _participantCardsPanel.Padding.Horizontal;
             if (availableWidth > 0 && participants.Count > 0)
             {
@@ -820,7 +817,6 @@ namespace G_Tara
             lblStatus.ForeColor = text;
             lblStatus.AutoSize = true;
 
-            // Hide the plain combobox — we paint a custom one
             cmbStatus.Visible = false;
             cmbStatus.Location = new Point(-500, -500);
             cmbStatus.Size = new Size(200, 24);
@@ -864,7 +860,6 @@ namespace G_Tara
             locationPanel.Paint -= OnLocationPanelPaint;
             locationPanel.Paint += OnLocationPanelPaint;
 
-            // Coordinates label below the row
             _lblCoordinates.ForeColor = Color.FromArgb(44, 128, 76);
             _lblCoordinates.Font = new Font("Segoe UI", 8.2F, FontStyle.Bold);
             _lblCoordinates.Location = new Point(140, 206);
@@ -888,7 +883,6 @@ namespace G_Tara
             lblCategory.ForeColor = text;
             lblCategory.AutoSize = true;
 
-            // Hide the plain combobox — replaced by custom pill + search card
             cmbCategory.Visible = false;
             cmbCategory.Location = new Point(-500, -500);
             cmbCategory.Size = new Size(176, 24);
@@ -919,7 +913,6 @@ namespace G_Tara
             lstSelectedLocations.BackColor = Color.FromArgb(255, 246, 248);
             lstSelectedLocations.BorderStyle = BorderStyle.FixedSingle;
 
-            // Add + Remove buttons centered side by side below the listbox
             int btnY = 560;
             int btnW = 120;
             int gap = 14;
@@ -950,7 +943,6 @@ namespace G_Tara
             lblWeather.AutoSize = true;
             lblWeather.Margin = new Padding(0, 8, 0, 0);
 
-            // Move Gala Host label+combo INSIDE participants panel header row
             lblHost.Location = new Point(130, 12);
             lblHost.Font = new Font("Segoe UI Semibold", 8.9F);
             lblHost.ForeColor = text;
@@ -1076,7 +1068,6 @@ namespace G_Tara
                 using var borderPen = new Pen(Color.FromArgb(170, 110, 125), 1.2f);
                 g.DrawPath(borderPen, path);
 
-                // Circle on left — sized to fit inside the pill height
                 int pad = 4;
                 int circleSize = btn.Height - (pad * 2);
                 var circleRect = new Rectangle(pad, pad, circleSize, circleSize);
@@ -1085,12 +1076,10 @@ namespace G_Tara
                 using var circlePen = new Pen(Color.FromArgb(185, 135, 145), 1f);
                 g.DrawEllipse(circlePen, circleRect);
 
-                // Vertical line centered inside circle
                 int lineX = pad + circleSize / 2;
                 using var linePen = new Pen(Color.FromArgb(130, 75, 85), 1.8f);
                 g.DrawLine(linePen, lineX, pad + 5, lineX, pad + circleSize - 5);
 
-                // Text to the right of the circle
                 int textLeft = pad + circleSize + 6;
                 var textRect = new Rectangle(textLeft, 0, btn.Width - textLeft - pad, btn.Height);
                 TextRenderer.DrawText(g, btn.Text, btn.Font, textRect, textColor,
@@ -1133,7 +1122,6 @@ namespace G_Tara
         {
             if (tb.Parent == null) return;
 
-            // Already wrapped
             if (tb.Parent is Panel p && p.Name == "roundedTbPanel_" + tb.Name) return;
 
             var parent = tb.Parent;
@@ -1202,7 +1190,6 @@ namespace G_Tara
                 TextRenderer.DrawText(g, selectedText, new Font("Segoe UI", 8.5F), textRect, textColor,
                     TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
 
-                // Building icon placeholder on right
                 int iconX = _categoryPill.Width - 32;
                 int iconY = 5;
                 var iconRect = new Rectangle(iconX, iconY, 22, 20);
@@ -1223,7 +1210,6 @@ namespace G_Tara
                 cmbCategory.Focus();
             };
 
-            // BUG FIX: wire dropdown events unconditionally (old guard was always false at this point).
             cmbCategory.Leave += (s, e) =>
             {
                 cmbCategory.Visible = false;
@@ -1252,11 +1238,11 @@ namespace G_Tara
 
             var statusColors = new[]
             {
-                Color.FromArgb(196, 120, 130), // Planned  - pink/rose
-                Color.FromArgb(80, 160, 200),  // Confirmed - blue
-                Color.FromArgb(80, 170, 110),  // Done      - green
-                Color.FromArgb(200, 180, 80),  // Cancelled - yellow/gold
-                Color.FromArgb(140, 140, 150)  // extra grey bar
+                Color.FromArgb(196, 120, 130),
+                Color.FromArgb(80, 160, 200),
+                Color.FromArgb(80, 170, 110),
+                Color.FromArgb(200, 180, 80),
+                Color.FromArgb(140, 140, 150)
             };
 
             _statusPill = new Panel
@@ -1317,7 +1303,6 @@ namespace G_Tara
                 cmbStatus.Focus();
             };
 
-            // BUG FIX: cmbStatus.Leave was wired twice in the original, causing double hide.
             cmbStatus.Leave += (s, e) =>
             {
                 cmbStatus.Visible = false;
@@ -1480,7 +1465,6 @@ namespace G_Tara
                 (int)(b.G + (t.G - b.G) * p),
                 (int)(b.B + (t.B - b.B) * p));
 
-        // BUG FIX: converted public fields to auto-properties for encapsulation and consistency.
         public class RoundedButtonStyleState
         {
             public Color Back { get; set; }

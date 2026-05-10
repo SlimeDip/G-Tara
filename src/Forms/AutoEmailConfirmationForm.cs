@@ -26,7 +26,7 @@ namespace G_Tara
         {
             InitializeComponent();
             
-            // Format Plan Details professionally
+
             var sb = new StringBuilder();
             sb.AppendLine($"Event: {gala.Name}");
             sb.AppendLine($"Date: {gala.ScheduledDate:MMMM dd, yyyy}");
@@ -40,7 +40,6 @@ namespace G_Tara
             txtPlanDetails.Text = sb.ToString();
             txtParticipants.Text = string.Join(Environment.NewLine, gala.Participants.Select(p => p.Email));
 
-            // Find Host Email
             var host = gala.Participants.FirstOrDefault(p => p.Name == gala.HostName);
             txtHostEmail.Text = host?.Email ?? "N/A";
 
@@ -148,7 +147,6 @@ namespace G_Tara
             Color btnHover = Color.FromArgb(235, 190, 195);
             Color btnDown = Color.FromArgb(200, 150, 155);
 
-            // Apply to both buttons[cite: 2, 3]
             ApplyRoundedButtonStyle(btnConfirm, btnBack, btnBorder, btnHover, btnDown, null);
             ApplyRoundedButtonStyle(btnCancel, btnBack, btnBorder, btnHover, btnDown, null);
         }
@@ -175,7 +173,6 @@ namespace G_Tara
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
 
-            // Create the rounded shape
             btn.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, btn.Width, btn.Height), 12));
 
             state.AnimationTimer = new System.Windows.Forms.Timer { Interval = 15 };
@@ -218,7 +215,6 @@ namespace G_Tara
             return p;
         }
 
-        // State class to track button animations
         public class RoundedButtonStyleState
         {
             public Color Back, Border, Hover, Down;

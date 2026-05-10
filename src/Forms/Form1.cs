@@ -23,7 +23,7 @@ namespace G_Tara
         private readonly WeatherService _weatherService;
         private Host? _currentHost;
         private List<Gala> _galas;
-        private List<Participant> _participants;  // BUG FIX: was assigned in constructor but never declared
+        private List<Participant> _participants;
         private bool _dateSortAscending = true;
 
         public Form1()
@@ -118,13 +118,11 @@ namespace G_Tara
                 return;
             }
 
-            // Position the logo first
             if (picMiniLogo != null)
             {
                 picMiniLogo.Location = new Point(12, (titleBar.Height - picMiniLogo.Height) / 2);
             }
 
-            // Position the title text right after the logo
             if (lblTitle != null && picMiniLogo != null)
             {
                 lblTitle.Location = new Point(picMiniLogo.Right + 8, (titleBar.Height - lblTitle.Height) / 2);
@@ -243,8 +241,6 @@ namespace G_Tara
                 return;
             }
 
-            // Force the entire selected row to use the theme selection color,
-            // including the "Id" column that tends to keep system highlight colors.
             var rowSelected = dgv.Rows[e.RowIndex].Selected;
             if (!rowSelected)
             {
@@ -313,10 +309,8 @@ namespace G_Tara
 
             btn.Tag = state;
 
-            // Prevent default theme drawing from fighting our custom paint.
             btn.UseCompatibleTextRendering = true;
 
-            // Ensure Region is applied immediately.
             btn.Region?.Dispose();
             btn.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, btn.Width, btn.Height), 16));
 
@@ -407,7 +401,6 @@ namespace G_Tara
                 using var path = CreateRoundedRectPath(rect, 16);
                 using var brush = new SolidBrush(fill);
 
-                // Soft shadow
                 var shadowRect = new Rectangle(rect.X + 2, rect.Y + 3, rect.Width, rect.Height);
                 using var shadowPath = CreateRoundedRectPath(shadowRect, 16);
                 using var shadowBrush = new SolidBrush(Color.FromArgb(30, 0, 0, 0));
@@ -417,17 +410,14 @@ namespace G_Tara
                 using var borderPen = new Pen(s.Border, 1);
                 e.Graphics.DrawPath(borderPen, path);
 
-                // Layout icon and text
                 var image = btn.Image;
                 var text = btn.Text ?? string.Empty;
                 var imageSize = 32;
                 var spacing = 4;
 
-                // Calculate total content height to center it as a block
                 var textSize = TextRenderer.MeasureText(text, btn.Font, new Size(rect.Width - 16, 100), TextFormatFlags.WordBreak);
                 var totalContentHeight = (image != null ? imageSize + spacing : 0) + textSize.Height;
 
-                // Starting Y position to center the icon+text block vertically
                 var startY = rect.Y + (rect.Height - totalContentHeight) / 2;
 
                 if (image != null)
@@ -682,8 +672,6 @@ namespace G_Tara
             participantsForm.ShowDialog(this);
         }
 
-        // BUG FIX: wrapped in try/catch so unhandled exceptions from the awaited task
-        // don't silently crash the application on the async void boundary.
         private async void btnAutoEmail_Click(object sender, EventArgs e)
         {
             var gala = GetSelectedGala();
@@ -760,7 +748,6 @@ namespace G_Tara
                 ? string.Empty
                 : $"{locationSection}\n";
 
-            // BUG FIX: SmtpClient implements IDisposable; wrap in using to ensure it is released.
             using var smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587)
             {
                 Credentials = new System.Net.NetworkCredential(smtpUser, smtpPass),
@@ -889,7 +876,6 @@ namespace G_Tara
             return $"https://www.google.com/maps/search/?api=1&query={query}";
         }
 
-        // Registered by Form1.Designer.cs; implement cell content click logic here if needed.
         private void dgvGalas_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
         }

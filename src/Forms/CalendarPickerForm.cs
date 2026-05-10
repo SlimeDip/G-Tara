@@ -25,7 +25,7 @@ namespace G_Tara
             Text = multiSelect ? "Pick Available Dates" : "Pick Date";
             StartPosition = FormStartPosition.CenterParent;
             Width = 520;
-            Height = 550; // Increased slightly for spacing
+            Height = 550;
 
             // G-Tara Colors
             this.BackColor = Color.FromArgb(242, 215, 217);
@@ -39,7 +39,7 @@ namespace G_Tara
                 BackColor = Color.Transparent
             };
             container.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            container.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F)); // Pink footer bar[cite: 3]
+            container.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
 
             _webView = new WebView2 { Dock = DockStyle.Fill };
 
@@ -48,7 +48,7 @@ namespace G_Tara
                 Dock = DockStyle.Fill,
                 ColumnCount = 4,
                 Padding = new Padding(10, 8, 10, 8),
-                BackColor = Color.FromArgb(189, 126, 131) // Darker pink footer
+                BackColor = Color.FromArgb(189, 126, 131)
             };
 
             bottomPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -333,7 +333,6 @@ namespace G_Tara
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
 
-            // Create the rounded shape
             btn.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, btn.Width, btn.Height), 12));
 
             state.AnimationTimer = new System.Windows.Forms.Timer { Interval = 15 };
@@ -376,7 +375,6 @@ namespace G_Tara
             return p;
         }
 
-        // State class to track button animations
         public class RoundedButtonStyleState
         {
             public Color Back, Border, Hover, Down;

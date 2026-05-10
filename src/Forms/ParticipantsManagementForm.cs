@@ -49,12 +49,12 @@ namespace G_Tara
             Color galaWhite = Color.FromArgb(255, 248, 248);
             Color galaText = Color.FromArgb(100, 60, 65);
             Color galaDeepPink = Color.FromArgb(189, 126, 131);
-            Color darkPinkText = Color.FromArgb(120, 40, 50); // Dark pink for button text
+            Color darkPinkText = Color.FromArgb(120, 40, 50);
             Color searchPink = Color.FromArgb(248, 225, 228);
 
 
             this.Text = "Manage Participants";
-            this.Size = new Size(900, 650); // Made slightly larger for cards
+            this.Size = new Size(900, 650);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = galaPinkLight;
             this.Font = new Font("Segoe UI Semibold", 9.5F);
@@ -126,10 +126,9 @@ namespace G_Tara
             Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 96, BackColor = Color.Transparent };
             Panel bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 100, BackColor = galaDeepPink, Padding = new Padding(0, 18, 0, 18) };
 
-            // Use a TableLayoutPanel to perfectly center the search container
             TableLayoutPanel centerTable = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1 };
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
-            centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500f)); // Search box width
+            centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500f));
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
 
             Panel searchContainer = new Panel { Size = new Size(500, 50), BackColor = searchPink, Anchor = AnchorStyles.None, Padding = new Padding(18, 10, 18, 10) };
@@ -162,23 +161,20 @@ namespace G_Tara
             searchLayout.Controls.Add(lblSearchIcon, 0, 0);
             searchLayout.Controls.Add(txtSearch, 1, 0);
             searchContainer.Controls.Add(searchLayout);
-            // Make search container pill-shaped
             searchContainer.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, 500, 50), 25));
 
             centerTable.Controls.Add(searchContainer, 1, 0);
             topPanel.Controls.Add(centerTable);
 
-            // --- MAIN AREA: FlowLayoutPanel for Cards ---
             cardContainer = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                Padding = new Padding(30, 10, 30, 40), // Increased bottom padding to prevent cutoff
+                Padding = new Padding(30, 10, 30, 40),
                 BackColor = Color.Transparent,
-                WrapContents = true // This allows side-by-side wrapping
+                WrapContents = true
             };
 
-            // Keep footer buttons centered with fixed sizes.
             TableLayoutPanel footerLayout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1 };
             footerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
             footerLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -194,7 +190,6 @@ namespace G_Tara
                 Padding = new Padding(0)
             };
 
-            // Create the 4 pill-shaped action buttons
             btnFooterAdd = new Button { Text = "👤 Add Participant", Size = new Size(180, 46), Cursor = Cursors.Hand, Margin = new Padding(8, 0, 8, 0) };
             btnFooterEdit = new Button { Text = "✎ Edit Details", Size = new Size(170, 46), Cursor = Cursors.Hand, Enabled = false, Margin = new Padding(8, 0, 8, 0) };
             btnFooterRemove = new Button { Text = "🗑 Remove Selected", Size = new Size(190, 46), Cursor = Cursors.Hand, Enabled = false, Margin = new Padding(8, 0, 8, 0) };
@@ -208,26 +203,21 @@ namespace G_Tara
             footerLayout.Controls.Add(footerButtons, 1, 0);
             bottomPanel.Controls.Add(footerLayout);
 
-            // Event wiring
             btnFooterAdd.Click += (s, e) => AddParticipant();
             btnFooterEdit.Click += (s, e) => { if (_selectedParticipant != null) EditSpecificParticipant(_selectedParticipant); };
             btnFooterRemove.Click += (s, e) => { if (_selectedParticipant != null) RemoveSpecificParticipant(_selectedParticipant); };
             btnFooterClose.Click += (s, e) => this.Close();
             txtSearch.TextChanged += (s, e) => RefreshGrid(txtSearch.Text);
 
-            // Apply Uniform Style: White background, Dark Pink Text
             ApplyPillButtonStyle(btnFooterAdd, galaWhite, darkPinkText);
             ApplyPillButtonStyle(btnFooterEdit, galaWhite, darkPinkText);
             ApplyPillButtonStyle(btnFooterRemove, galaWhite, darkPinkText);
             ApplyPillButtonStyle(btnFooterClose, galaWhite, darkPinkText);
 
-            // --- FINAL ASSEMBLY ---
-            // In WinForms, for controls with the same Dock style, 
-            // the control added LAST (or SendToBack) sits closest to the edge.
-            this.Controls.Add(cardContainer); // Index 0: Fills remaining space
-            this.Controls.Add(bottomPanel);   // Index 1: Bottom edge
-            this.Controls.Add(topPanel);      // Index 2: Top (below title bar)
-            this.Controls.Add(pnlTitleBar);   // Index 3: Absolute Top Edge
+            this.Controls.Add(cardContainer);
+            this.Controls.Add(bottomPanel);
+            this.Controls.Add(topPanel);
+            this.Controls.Add(pnlTitleBar);
 
             LayoutWindowButtons();
 
@@ -255,7 +245,6 @@ namespace G_Tara
         {
             cardContainer.Controls.Clear();
 
-            // Filter participants if a search term exists
             var displayList = string.IsNullOrWhiteSpace(searchTerm)
                 ? _participants
                 : _participants.Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -271,7 +260,6 @@ namespace G_Tara
             using var dialog = new ParticipantInputDialog();
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                // Save the image to the local folder and get the path
                 string savedImagePath = SaveParticipantImage(dialog.ParticipantImagePath, dialog.ParticipantName);
 
                 var participant = new Participant
@@ -283,7 +271,7 @@ namespace G_Tara
                 };
 
                 _dataService.SaveParticipant(participant);
-                LoadParticipants(); // Refresh the card list
+                LoadParticipants();
             }
         }
 
@@ -309,7 +297,6 @@ namespace G_Tara
             }
             ApplyRegion();
             btn.Resize += (s, e) => ApplyRegion();
-            // Hover effect
             btn.MouseEnter += (s, e) =>
             {
                 btn.BackColor = Color.FromArgb(240, 240, 240);
@@ -321,7 +308,6 @@ namespace G_Tara
         private Panel CreateParticipantCard(Participant p)
         {
             Color cardBack = Color.FromArgb(255, 248, 248);
-            // Width 410 allows two cards to fit side-by-side in a 900-950px form
             Panel card = new Panel { Size = new Size(360, 174), Margin = new Padding(15), BackColor = cardBack, Padding = new Padding(12) };
             TableLayoutPanel mainLayout = new TableLayoutPanel
             {
@@ -339,7 +325,7 @@ namespace G_Tara
                 Size = new Size(110, 110),
                 Anchor = AnchorStyles.None,
                 Image = (string.IsNullOrEmpty(p.ImagePath) || !File.Exists(p.ImagePath)) ? null : Image.FromFile(p.ImagePath),
-                BorderColorStart = Color.FromArgb(212, 175, 55), // Gold
+                BorderColorStart = Color.FromArgb(212, 175, 55),
                 BorderColorEnd = Color.FromArgb(255, 235, 150)
             };
             FlowLayoutPanel textFlow = new FlowLayoutPanel
@@ -406,7 +392,6 @@ namespace G_Tara
                 pen.Alignment = PenAlignment.Inset;
                 e.Graphics.DrawPath(pen, path);
             };
-            // Selection logic (Clicking card enables footer buttons)
             void OnCardSelected(object? s, EventArgs e)
             {
                 Panel? previouslySelected = _selectedCardPanel;
@@ -415,18 +400,15 @@ namespace G_Tara
                 btnFooterEdit.Enabled = true;
                 btnFooterRemove.Enabled = true;
 
-                // Redraw only the cards whose selection state changed.
                 previouslySelected?.Invalidate();
                 card.Invalidate();
             }
             card.Click += OnCardSelected;
-            // Ensure clicking any child control also selects the card
             foreach (Control c in textFlow.Controls) c.Click += OnCardSelected;
             foreach (Control c in mainLayout.Controls) c.Click += OnCardSelected;
             return card;
         }
 
-        // Helper to bridge the click to your existing Edit logic
         private void EditSpecificParticipant(Participant p)
         {
             using var dialog = new ParticipantInputDialog
@@ -459,7 +441,7 @@ namespace G_Tara
                     Name = dialog.ParticipantName,
                     Email = dialog.ParticipantEmail,
                     AvailableDates = dialog.ParticipantAvailableDates,
-                    ImagePath = savedImagePath // Ensure your Participant model has this property
+                    ImagePath = savedImagePath
                 };
                 _dataService.SaveParticipant(participant);
                 LoadParticipants();
@@ -472,7 +454,6 @@ namespace G_Tara
 
             try
             {
-                // Create folder if it doesn't exist
                 string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParticipantPhotos");
                 if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
@@ -482,7 +463,7 @@ namespace G_Tara
                 string destPath = Path.Combine(folderPath, fileName);
 
                 File.Copy(sourcePath, destPath, true);
-                return destPath; // Return the path to store in the database/service
+                return destPath;
             }
             catch (Exception ex)
             {
@@ -494,14 +475,11 @@ namespace G_Tara
 
         private void RemoveSpecificParticipant(Participant p)
         {
-            // Confirm with the user
             if (MessageBox.Show($"Are you sure you want to remove {p.Name} (ID: {p.Id})?",
                 "Confirm Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                // Delete from data service
                 _dataService.DeleteParticipant(p.Id);
 
-                // Refresh the card container
                 LoadParticipants();
                 txtSearch.Clear();
             }
@@ -515,7 +493,6 @@ namespace G_Tara
             Color btnHover = Color.FromArgb(235, 190, 195);
             Color btnDown = Color.FromArgb(200, 150, 155);
 
-            // Apply to all footer buttons
             ApplyRoundedButtonStyle(btnFooterAdd, btnBack, btnBorder, btnHover, btnDown, null);
             ApplyRoundedButtonStyle(btnFooterEdit, btnBack, btnBorder, btnHover, btnDown, null);
             ApplyRoundedButtonStyle(btnFooterRemove, btnBack, btnBorder, btnHover, btnDown, null);
@@ -531,7 +508,6 @@ namespace G_Tara
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
 
-            // Apply the 12px rounded region to the button
             btn.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, btn.Width, btn.Height), 12));
 
             state.AnimationTimer = new System.Windows.Forms.Timer { Interval = 15 };
@@ -557,7 +533,6 @@ namespace G_Tara
             btn.Paint += (s, e) => {
                 e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-                // Calculate the current color based on animation progress
                 Color current = state.IsDown ? state.Down : Interpolate(state.Back, state.Hover, state.HoverProgress);
 
                 using (var path = CreateRoundedRectPath(new Rectangle(0, 0, btn.Width - 1, btn.Height - 1), 12))
@@ -566,7 +541,6 @@ namespace G_Tara
                     using (var pen = new Pen(state.Border, 1f)) e.Graphics.DrawPath(pen, path);
                 }
 
-                // Draw the button text centered
                 TextRenderer.DrawText(e.Graphics, btn.Text, btn.Font, btn.ClientRectangle, Color.FromArgb(64, 64, 64),
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
             };
@@ -594,7 +568,7 @@ namespace G_Tara
             }
             catch
             {
-                // Ignore load failures so the form still works.
+                
             }
         }
 
@@ -646,7 +620,6 @@ namespace G_Tara
             return p;
         }
 
-        // State class to track independent animation progress for each button
         public class RoundedButtonStyleState
         {
             public Color Back, Border, Hover, Down;
@@ -695,7 +668,6 @@ namespace G_Tara
 
         public CircleProfile()
         {
-            // This prevents flickering during paint
             this.DoubleBuffered = true;
             this.Size = new Size(120, 120);
         }
@@ -710,7 +682,6 @@ namespace G_Tara
                 path.AddEllipse(rect);
                 this.Region = new Region(path);
 
-                // Fill background first (in case image is transparent)
                 e.Graphics.FillEllipse(Brushes.White, rect);
 
                 if (Image != null)

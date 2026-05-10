@@ -61,7 +61,6 @@ namespace G_Tara
                 Text = $"Lat: {SelectedLatitude:F6}, Lon: {SelectedLongitude:F6}",
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI Semibold", 10F),
-                // Change this line:
                 Anchor = AnchorStyles.Left,
                 TextAlign = ContentAlignment.MiddleLeft
             };
@@ -230,7 +229,6 @@ namespace G_Tara
             ApplyRoundedButtonStyle(_btnCancel, btnBack, btnBorder, btnHover, btnDown, null);
         }
 
-        // --- G-TARA UI ENGINE (Paste these if not shared) ---[cite: 2]
         private static void ApplyRoundedButtonStyle(Button btn, Color back, Color border, Color hover, Color down, System.Media.SoundPlayer? hoverSound)
         {
             if (btn.Tag is RoundedButtonStyleState) return;
