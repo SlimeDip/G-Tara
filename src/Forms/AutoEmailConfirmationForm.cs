@@ -38,7 +38,7 @@ namespace G_Tara
             sb.AppendLine("See you there!");
             
             txtPlanDetails.Text = sb.ToString();
-            txtParticipants.Text = string.Join(", ", gala.Participants.Select(p => p.Email));
+            txtParticipants.Text = string.Join(Environment.NewLine, gala.Participants.Select(p => p.Email));
 
             // Find Host Email
             var host = gala.Participants.FirstOrDefault(p => p.Name == gala.HostName);
