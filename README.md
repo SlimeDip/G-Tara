@@ -1,11 +1,24 @@
 <div align="center">
-	
-<img src="src/Assets/Logo Animated.jpg" alt="G-Tara Logo" width="300"/>
+  <img src="src/Assets/Logo Animated.jpg" alt="G-Tara Logo" width="250"/>
+  <h1>🌟 G-Tara — Gala Planning Assistant 🌟</h1>
+  <p><i>Your ultimate companion for seamless gala coordination and scheduling.</i></p>
 
-<h1 align="center">G-Tara — Gala Planning Assistant</h1>
-G-Tara is a Windows Forms application for planning and coordinating galas. Hosts can schedule events, manage participants and availability, select locations, and share plans with attendees.
+  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#"/>
+  <img src="https://img.shields.io/badge/.NET_10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 10"/>
+  <img src="https://img.shields.io/badge/WinForms-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="WinForms"/>
+  <img src="https://img.shields.io/badge/OpenWeather-EB6E4B?style=for-the-badge&logo=openweather&logoColor=white" alt="OpenWeather"/>
 
+  <p>
+    <a href="#-overview">Overview</a> •
+    <a href="#-features">Features</a> •
+    <a href="#-uml-diagram">UML Diagram</a> •
+    <a href="#-oop-principles">OOP Principles</a> •
+    <a href="#-getting-started">Getting Started</a> •
+    <a href="#-authors--credits">Authors</a>
+  </p>
 </div>
+
+---
 
 ## Overview
 In G-Tara, users organize a gala from start to finish. They pick dates, locations, and participants, then finalize a plan with weather-aware tips and optional email updates.
