@@ -175,11 +175,10 @@ namespace G_Tara
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                Padding = new Padding(30, 10, 30, 10),
+                Padding = new Padding(30, 10, 30, 40), // Increased bottom padding to prevent cutoff
                 BackColor = Color.Transparent,
                 WrapContents = true // This allows side-by-side wrapping
             };
-
 
             // Keep footer buttons centered with fixed sizes.
             TableLayoutPanel footerLayout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1 };
@@ -224,12 +223,13 @@ namespace G_Tara
             ApplyPillButtonStyle(btnFooterRemove, galaWhite, darkPinkText);
             ApplyPillButtonStyle(btnFooterClose, galaWhite, darkPinkText);
 
-
-            this.Controls.Add(bottomPanel);
             this.Controls.Add(cardContainer);
             this.Controls.Add(topPanel);
-
-
+            this.Controls.Add(bottomPanel);
+            
+            // Add Title Bar LAST so it stays at the very top (outermost Dock.Top)
+            this.Controls.Add(pnlTitleBar);
+            pnlTitleBar.BringToFront();
 
             ApplyGaraTheme();
             this.Load += ParticipantsManagementForm_Load;
