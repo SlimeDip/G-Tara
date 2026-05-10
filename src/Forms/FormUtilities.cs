@@ -32,9 +32,19 @@ namespace G_Tara
             return new Size(Scale(size.Width, scale), Scale(size.Height, scale));
         }
 
-        public static Point ScalePoint(Point point, float scale)
+        public static Font ScaleFont(Font font, float scale)
         {
-            return new Point(Scale(point.X, scale), Scale(point.Y, scale));
+            return new Font(font.FontFamily, font.Size * scale, font.Style);
+        }
+
+        public static Rectangle ScaleRectangle(Rectangle rect, float scale)
+        {
+            return new Rectangle(Scale(rect.X, scale), Scale(rect.Y, scale), Scale(rect.Width, scale), Scale(rect.Height, scale));
+        }
+
+        public static Padding ScalePadding(Padding padding, float scale)
+        {
+            return new Padding(Scale(padding.Left, scale), Scale(padding.Top, scale), Scale(padding.Right, scale), Scale(padding.Bottom, scale));
         }
     }
 }
