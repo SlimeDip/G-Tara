@@ -125,15 +125,15 @@ namespace G_Tara
 
             LayoutWindowButtons();
 
-            Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 96, BackColor = Color.Transparent };
-            Panel bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 100, BackColor = galaDeepPink, Padding = new Padding(0, 18, 0, 18) };
+            Panel topPanel = new Panel { Dock = DockStyle.Top, Height = FormUtilities.Scale(96, scale), BackColor = Color.Transparent };
+            Panel bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = FormUtilities.Scale(100, scale), BackColor = galaDeepPink, Padding = FormUtilities.ScalePadding(new Padding(0, 18, 0, 18), scale) };
 
             TableLayoutPanel centerTable = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 1 };
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
-            centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500f));
+            centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, FormUtilities.Scale(500, scale)));
             centerTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
 
-            Panel searchContainer = new Panel { Size = new Size(500, 50), BackColor = searchPink, Anchor = AnchorStyles.None, Padding = new Padding(18, 10, 18, 10) };
+            Panel searchContainer = new Panel { Size = FormUtilities.ScaleSize(new Size(500, 50), scale), BackColor = searchPink, Anchor = AnchorStyles.None, Padding = FormUtilities.ScalePadding(new Padding(18, 10, 18, 10), scale) };
             TableLayoutPanel searchLayout = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
@@ -141,7 +141,7 @@ namespace G_Tara
                 RowCount = 1,
                 BackColor = Color.Transparent
             };
-            searchLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 34f));
+            searchLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, FormUtilities.Scale(34, scale)));
             searchLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
             Label lblSearchIcon = new Label
             {
@@ -149,21 +149,21 @@ namespace G_Tara
                 Dock = DockStyle.Fill,
                 TextAlign = ContentAlignment.MiddleCenter,
                 AutoSize = false,
-                Font = new Font("Segoe UI", 12),
+                Font = FormUtilities.ScaleFont(new Font("Segoe UI", 12), scale),
                 BackColor = Color.Transparent
             };
             txtSearch = new TextBox
             {
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI", 12),
+                Font = FormUtilities.ScaleFont(new Font("Segoe UI", 12), scale),
                 PlaceholderText = "Search participants...",
                 BackColor = searchPink
             };
             searchLayout.Controls.Add(lblSearchIcon, 0, 0);
             searchLayout.Controls.Add(txtSearch, 1, 0);
             searchContainer.Controls.Add(searchLayout);
-            searchContainer.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, 500, 50), 25));
+            searchContainer.Region = new Region(CreateRoundedRectPath(new Rectangle(0, 0, searchContainer.Width, searchContainer.Height), FormUtilities.Scale(25, scale)));
 
             centerTable.Controls.Add(searchContainer, 1, 0);
             topPanel.Controls.Add(centerTable);
@@ -172,7 +172,7 @@ namespace G_Tara
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                Padding = new Padding(30, 10, 30, 40),
+                Padding = FormUtilities.ScalePadding(new Padding(30, 10, 30, 40), scale),
                 BackColor = Color.Transparent,
                 WrapContents = true
             };
@@ -192,10 +192,10 @@ namespace G_Tara
                 Padding = new Padding(0)
             };
 
-            btnFooterAdd = new Button { Text = "👤 Add Participant", Size = new Size(180, 46), Cursor = Cursors.Hand, Margin = new Padding(8, 0, 8, 0) };
-            btnFooterEdit = new Button { Text = "✎ Edit Details", Size = new Size(170, 46), Cursor = Cursors.Hand, Enabled = false, Margin = new Padding(8, 0, 8, 0) };
-            btnFooterRemove = new Button { Text = "🗑 Remove Selected", Size = new Size(190, 46), Cursor = Cursors.Hand, Enabled = false, Margin = new Padding(8, 0, 8, 0) };
-            btnFooterClose = new Button { Text = "× Close", Size = new Size(120, 46), Cursor = Cursors.Hand, Margin = new Padding(8, 0, 8, 0) };
+            btnFooterAdd = new Button { Text = "👤 Add Participant", Size = FormUtilities.ScaleSize(new Size(180, 46), scale), Cursor = Cursors.Hand, Margin = FormUtilities.ScalePadding(new Padding(8, 0, 8, 0), scale) };
+            btnFooterEdit = new Button { Text = "✎ Edit Details", Size = FormUtilities.ScaleSize(new Size(170, 46), scale), Cursor = Cursors.Hand, Enabled = false, Margin = FormUtilities.ScalePadding(new Padding(8, 0, 8, 0), scale) };
+            btnFooterRemove = new Button { Text = "🗑 Remove Selected", Size = FormUtilities.ScaleSize(new Size(190, 46), scale), Cursor = Cursors.Hand, Enabled = false, Margin = FormUtilities.ScalePadding(new Padding(8, 0, 8, 0), scale) };
+            btnFooterClose = new Button { Text = "× Close", Size = FormUtilities.ScaleSize(new Size(120, 46), scale), Cursor = Cursors.Hand, Margin = FormUtilities.ScalePadding(new Padding(8, 0, 8, 0), scale) };
 
             footerButtons.Controls.Add(btnFooterAdd);
             footerButtons.Controls.Add(btnFooterEdit);
@@ -309,22 +309,23 @@ namespace G_Tara
 
         private Panel CreateParticipantCard(Participant p)
         {
+            var scale = FormUtilities.GetDpiScale(this);
             Color cardBack = Color.FromArgb(255, 248, 248);
-            Panel card = new Panel { Size = new Size(360, 174), Margin = new Padding(15), BackColor = cardBack, Padding = new Padding(12) };
+            Panel card = new Panel { Size = FormUtilities.ScaleSize(new Size(360, 174), scale), Margin = FormUtilities.ScalePadding(new Padding(15), scale), BackColor = cardBack, Padding = FormUtilities.ScalePadding(new Padding(12), scale) };
             TableLayoutPanel mainLayout = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
                 RowCount = 1,
-                Padding = new Padding(10),
+                Padding = FormUtilities.ScalePadding(new Padding(10), scale),
                 Margin = new Padding(0),
                 BackColor = cardBack
             };
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 130f));
+            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, FormUtilities.Scale(130, scale)));
             mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
             CircleProfile picCircle = new CircleProfile
             {
-                Size = new Size(110, 110),
+                Size = FormUtilities.ScaleSize(new Size(110, 110), scale),
                 Anchor = AnchorStyles.None,
                 Image = (string.IsNullOrEmpty(p.ImagePath) || !File.Exists(p.ImagePath)) ? null : Image.FromFile(p.ImagePath),
                 BorderColorStart = Color.FromArgb(212, 175, 55),
@@ -335,11 +336,11 @@ namespace G_Tara
                 Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                Padding = new Padding(10, 10, 0, 0),
+                Padding = FormUtilities.ScalePadding(new Padding(10, 10, 0, 0), scale),
                 BackColor = cardBack
             };
-            Label lblName = new Label { Text = $"Name: {p.Name}", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = Color.FromArgb(120, 40, 50), AutoSize = true, BackColor = cardBack };
-            Label lblEmail = new Label { Text = $"Email: {p.Email}", Font = new Font("Segoe UI", 10), ForeColor = Color.FromArgb(80, 40, 45), AutoSize = true, BackColor = cardBack };
+            Label lblName = new Label { Text = $"Name: {p.Name}", Font = FormUtilities.ScaleFont(new Font("Segoe UI", 12, FontStyle.Bold), scale), ForeColor = Color.FromArgb(120, 40, 50), AutoSize = true, BackColor = cardBack };
+            Label lblEmail = new Label { Text = $"Email: {p.Email}", Font = FormUtilities.ScaleFont(new Font("Segoe UI", 10), scale), ForeColor = Color.FromArgb(80, 40, 45), AutoSize = true, BackColor = cardBack };
             string availabilityText = "Dates: No dates set";
             if (p.AvailableDates?.Any() == true)
             {
@@ -349,23 +350,23 @@ namespace G_Tara
             Label lblDates = new Label
             {
                 Text = availabilityText,
-                Font = new Font("Segoe UI", 10),
+                Font = FormUtilities.ScaleFont(new Font("Segoe UI", 10), scale),
                 ForeColor = Color.FromArgb(80, 40, 45),
                 BackColor = cardBack,
                 AutoSize = false,
-                Size = new Size(190, 36),
+                Size = FormUtilities.ScaleSize(new Size(190, 36), scale),
                 AutoEllipsis = true
             };
             Label lblId = new Label
             {
                 Text = $"ID: {p.Id}",
-                Font = new Font("Segoe UI", 8),
+                Font = FormUtilities.ScaleFont(new Font("Segoe UI", 8), scale),
                 ForeColor = Color.Gray,
                 BackColor = cardBack,
                 AutoSize = false,
-                Size = new Size(190, 28),
+                Size = FormUtilities.ScaleSize(new Size(190, 28), scale),
                 AutoEllipsis = true,
-                Margin = new Padding(0, 5, 0, 0)
+                Margin = FormUtilities.ScalePadding(new Padding(0, 5, 0, 0), scale)
             };
             textFlow.Controls.AddRange(new Control[] { lblName, lblEmail, lblDates, lblId });
             mainLayout.Controls.Add(picCircle, 0, 0);
