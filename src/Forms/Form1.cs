@@ -183,7 +183,7 @@ namespace G_Tara
             if (btnManageParticipants != null)
             {
                 btnManageParticipants.Text = "Manage\r\nParticipants";
-                btnManageParticipants.Font = new Font("Comic Sans MS", 8.5F, FontStyle.Bold);
+                btnManageParticipants.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             }
 
             ApplyListStyling();
@@ -266,7 +266,7 @@ namespace G_Tara
             btn.FlatAppearance.BorderSize = 0;
             btn.FlatAppearance.MouseOverBackColor = Color.Transparent;
             btn.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            btn.Font = new Font("Comic Sans MS", 10F, FontStyle.Bold);
+            btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btn.ForeColor = Color.FromArgb(60, 45, 48);
             btn.Size = new Size(
                 (int)Math.Round(156 * scale),
@@ -524,14 +524,44 @@ namespace G_Tara
 
         private void RefreshGalasList()
         {
-            dgvGalas.DataSource = null;
-            dgvGalas.DataSource = _galas
-                .OrderBy(g => g.ScheduledDate)
-                .ToList();
+            var sorted = _dateSortAscending
+                ? _galas.OrderBy(g => g.ScheduledDate).ToList()
+                : _galas.OrderByDescending(g => g.ScheduledDate).ToList();
+            
+            RefreshGalasListWithData(sorted);
+        }
 
-            if (dgvGalas.Columns.Contains("colDate"))
+        private void RefreshGalasListWithData(List<Gala> data)
+        {
+            dgvGalas.DataSource = null;
+            dgvGalas.DataSource = data;
+
+            // Hide unwanted auto-generated columns
+            string[] toHide = { "Id", "Latitude", "Longitude", "RangeStartDate", "RangeEndDate", "LocationItems", "Participants" };
+            foreach (var colName in toHide)
             {
-                dgvGalas.Columns["colDate"].DefaultCellStyle.Format = "yyyy-MM-dd";
+                if (dgvGalas.Columns.Contains(colName))
+                {
+                    dgvGalas.Columns[colName].Visible = false;
+                }
+            }
+
+            // Format and rename columns
+            if (dgvGalas.Columns.Contains("ScheduledDate"))
+            {
+                dgvGalas.Columns["ScheduledDate"].HeaderText = "Date";
+                dgvGalas.Columns["ScheduledDate"].DefaultCellStyle.Format = "yyyy-MM-dd";
+                dgvGalas.Columns["ScheduledDate"].Width = 100;
+            }
+
+            if (dgvGalas.Columns.Contains("Weather"))
+            {
+                dgvGalas.Columns["Weather"].Width = 150;
+            }
+
+            if (dgvGalas.Columns.Contains("HostName"))
+            {
+                dgvGalas.Columns["HostName"].HeaderText = "Host";
             }
         }
 
@@ -549,13 +579,7 @@ namespace G_Tara
             }
 
             _dateSortAscending = !_dateSortAscending;
-            var sorted = _dateSortAscending
-                ? _galas.OrderBy(g => g.ScheduledDate).ToList()
-                : _galas.OrderByDescending(g => g.ScheduledDate).ToList();
-
-            dgvGalas.DataSource = null;
-            dgvGalas.DataSource = sorted;
-            dgvGalas.Columns["colDate"].DefaultCellStyle.Format = "yyyy-MM-dd";
+            RefreshGalasList();
         }
 
         private Gala? GetSelectedGala()

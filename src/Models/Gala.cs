@@ -83,6 +83,8 @@ namespace G_Tara.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string Address { get; set; } = string.Empty;
+
+        public override string ToString() => Name;
     }
 
     public class WeatherData
@@ -92,6 +94,11 @@ namespace G_Tara.Models
         public int Humidity { get; set; }
         public double WindSpeed { get; set; }
         public string IconUrl { get; set; } = string.Empty;
+
+        public override string ToString()
+        {
+            return $"{Description}, {Temperature}°C";
+        }
     }
 
     public class Participant : Person
@@ -129,6 +136,8 @@ namespace G_Tara.Models
                 return "None";
             }
         }
+
+        public override string ToString() => DisplayName;
     }
 
     public class Host : Person
